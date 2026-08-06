@@ -1,0 +1,190 @@
+---
+import { Image } from 'astro:assets';
+import { Icon } from 'astro-icon/components';
+import Section from '../ui/Section.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import Card from '../ui/Card.astro';
+import fotoEsteban from '../../assets/team/esteban.jpg';
+import fotoMatias from '../../assets/team/matias.jpg';
+
+// TODO: validar las bios de los socios con el cliente antes de publicar.
+const socios = [
+  {
+    nombre: 'Esteban Asensio',
+    rol: 'Contador Público',
+    foto: fotoEsteban,
+    alt: 'Foto de Esteban Asensio',
+    bio: 'Socio fundador. Se especializa en estructura tributaria y asesoramiento societario, acompañando a empresas en su constitución y en las decisiones que definen su crecimiento.',
+    linkedin: 'https://www.linkedin.com/in/esteban-asensio-0ab8a23b/',
+    // TODO: confirmar casilla de email de Esteban Asensio.
+    email: '#',
+  },
+  {
+    nombre: 'Matías Martínez',
+    rol: 'Contador Público',
+    foto: fotoMatias,
+    alt: 'Foto de Matías Martínez',
+    bio: 'Socio. Lidera el área de gestión contable y liquidaciones, con foco en la implementación de herramientas digitales para simplificar la operación diaria de los clientes.',
+    linkedin: 'https://www.linkedin.com/in/mat%C3%ADas-martinez-7982a175/',
+    // TODO: confirmar casilla de email de Matías Martínez.
+    email: '#',
+  },
+];
+
+const principios = [
+  {
+    numero: '01',
+    titulo: 'Personalización',
+    texto:
+      'Cada emprendimiento tiene una problemática distinta. Los servicios se arman a medida de cada caso, no al revés.',
+  },
+  {
+    numero: '02',
+    titulo: 'Actualización',
+    texto:
+      'El contexto cambia todo el tiempo. Eso exige actualización profesional constante y una mirada que se renueva.',
+  },
+  {
+    numero: '03',
+    titulo: 'Confiabilidad',
+    texto:
+      'Se construye con soluciones apropiadas, coherentes y consistentes para cada problema planteado.',
+  },
+  {
+    numero: '04',
+    titulo: 'Optimización',
+    texto:
+      'Valoramos tu tiempo tanto como el nuestro. Por eso implementamos herramientas de gestión acordes a la dinámica actual.',
+  },
+];
+---
+
+<Section id="el-estudio" background="tint" class="scroll-mt-32">
+  {/* ---------------- Parte 1: los socios ---------------- */}
+  <SectionHeading
+    eyebrow="El estudio"
+    title="Dos contadores, un mismo criterio"
+    subtitle="Desde 2007 atendemos personalmente a cada cliente. Cuando nos escribís, te responde uno de nosotros."
+  />
+
+  <ul class="mt-14 grid grid-cols-1 gap-8 lg:grid-cols-2">
+    {
+      socios.map((socio, i) => (
+        <li data-reveal style={`--reveal-delay: ${i * 80}ms`}>
+          <Card padding="none" class="overflow-hidden">
+            {/*
+              aspect-square + overflow-hidden acá en vez de en la <Image>: la
+              foto de origen es 3:2 (horizontal), no cuadrada, así que hace
+              falta un contenedor que fuerce el recorte y object-cover para
+              que se vea cuadrada sin deformarse. group-hover depende del
+              `group` que Card ya trae en su propia clase.
+            */}
+            <div class="aspect-square overflow-hidden grayscale transition-[filter] duration-300 group-hover:grayscale-0">
+              <Image
+                src={socio.foto}
+                alt={socio.alt}
+                width={1200}
+                class="h-full w-full object-cover"
+              />
+            </div>
+
+            <div class="p-7">
+              <p class="font-display text-navy-900 text-[22px] font-bold">
+                {socio.nombre}
+              </p>
+              <p class="text-brand-700 mt-1 text-[15px] font-medium">
+                {socio.rol}
+              </p>
+
+              <span
+                class="bg-brand-600 mt-4 block h-0.5 w-8"
+                aria-hidden="true"
+              />
+
+              <p class="text-muted mt-4 text-base leading-relaxed">
+                {socio.bio}
+              </p>
+
+              <div class="mt-6 flex items-center gap-3">
+                <a
+                  href={socio.linkedin}
+                  target="_blank"
+                  rel="noopener"
+                  aria-label={`LinkedIn de ${socio.nombre}`}
+                  class="border-line text-muted hover:border-brand-600 hover:text-brand-700 flex size-11 items-center justify-center border transition-colors duration-200"
+                >
+                  <Icon
+                    name="lucide:linkedin"
+                    class="size-4"
+                    aria-hidden="true"
+                  />
+                </a>
+                <a
+                  href={socio.email}
+                  aria-label={`Email de ${socio.nombre}`}
+                  class="border-line text-muted hover:border-brand-600 hover:text-brand-700 flex size-11 items-center justify-center border transition-colors duration-200"
+                >
+                  <Icon name="lucide:mail" class="size-4" aria-hidden="true" />
+                </a>
+              </div>
+            </div>
+          </Card>
+        </li>
+      ))
+    }
+  </ul>
+
+  {/* ---------------- Parte 2: los principios ---------------- */}
+  <div class="mt-16">
+    <h3 class="font-display text-navy-900 text-center text-3xl">
+      Cuatro ideas que no negociamos
+    </h3>
+
+    <ul
+      class="mt-12 grid grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-2 lg:grid-cols-4"
+    >
+      {
+        principios.map((p, i) => (
+          <li data-reveal style={`--reveal-delay: ${i * 80}ms`}>
+            <p class="text-brand-700 font-mono text-sm font-semibold">
+              {p.numero}
+            </p>
+            <h4 class="mt-2 text-lg font-semibold">{p.titulo}</h4>
+            <p class="text-muted mt-2 text-base leading-relaxed">{p.texto}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  {/* ---------------- Cierre: la cita ---------------- */}
+  {
+    /*
+    Sin max-width propio: la cita usa todo el ancho del container-xl (1120px
+    de contenido) para entrar en dos renglones.
+
+    El max-w-[30ch] que había antes era una trampa: `ch` se resuelve contra
+    la fuente del ELEMENTO donde está el max-width — acá el <blockquote>, que
+    hereda Roboto 18px del body— y no contra los 32px de Poppins del <p> de
+    adentro. O sea que 30ch daban ~300px de caja para un texto que se dibuja
+    a 32px, y la frase se partía en cinco o seis renglones.
+
+    text-balance para que los dos renglones queden parejos en vez de uno
+    largo y uno corto (es una cita centrada, se nota mucho).
+  */
+  }
+  <blockquote class="mt-16 text-center">
+    <p
+      class="text-brand-600/20 font-display text-[100px] leading-none"
+      aria-hidden="true"
+    >
+      &ldquo;
+    </p>
+    <p
+      class="font-display text-brand-600 -mt-8 text-[32px] leading-snug text-balance"
+    >
+      Porque la realidad está en constante cambio, al igual que tus necesidades,
+      readecuamos nuestros servicios.
+    </p>
+  </blockquote>
+</Section>

@@ -1,0 +1,168 @@
+---
+import { Icon } from 'astro-icon/components';
+import Section from '../ui/Section.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+
+const metricas = [
+  { prefijo: '', valor: 2007, sufijo: '', label: 'Año de fundación' },
+  { prefijo: '', valor: 18, sufijo: '', label: 'Años de experiencia' },
+  // TODO: confirmar la cifra de clientes acompañados con el estudio.
+  { prefijo: '+', valor: 150, sufijo: '', label: 'Clientes acompañados' },
+  { prefijo: '', valor: 24, sufijo: ' h', label: 'Tiempo de respuesta' },
+];
+
+const diferenciales = [
+  {
+    icon: 'lucide:award',
+    titulo: 'Experiencia en la profesión',
+    texto:
+      'Casi dos décadas resolviendo situaciones contables, impositivas y societarias de todo tipo. Ya vimos tu caso antes, y sabemos por dónde empezar.',
+  },
+  {
+    icon: 'lucide:graduation-cap',
+    titulo: 'Capacitación permanente',
+    texto:
+      'La normativa argentina cambia todo el tiempo. Nos actualizamos de forma continua para que las decisiones que tomás estén basadas en lo que rige hoy, no en lo que regía el año pasado.',
+  },
+  {
+    icon: 'lucide:heart-handshake',
+    titulo: 'Compromiso con lo que necesitás',
+    texto:
+      'No entregamos soluciones de manual. Escuchamos tu situación puntual y armamos una respuesta que se adapte a tu realidad, tu tamaño y tus tiempos.',
+  },
+  {
+    icon: 'lucide:cpu',
+    titulo: 'Tecnología como política del estudio',
+    texto:
+      'Incorporar herramientas digitales es una decisión de fondo del estudio, no una moda. Eso se traduce en menos papel, menos idas y vueltas y más tiempo para lo que importa.',
+  },
+];
+---
+
+<Section background="white">
+  {
+    /*
+    El valor final ya va en el HTML servido (2007, 18, 150, 24), no "0": si el
+    JS no corre, el visitante lee el número real, no un contador trabado en
+    cero. El script sólo lo hace ARRANCAR desde 0 y contar hasta ese mismo
+    valor cuando entra en viewport.
+  */
+  }
+  <ul
+    class="metric-strip border-line lg:divide-line grid grid-cols-2 gap-y-10 border-b pb-14 text-center lg:grid-cols-4 lg:gap-y-0 lg:divide-x"
+  >
+    {
+      metricas.map((m) => (
+        <li class="px-4">
+          {/*
+            El prefijo/sufijo van como contenido generado por CSS
+            (::before/::after con content: attr(...)), no como texto en el
+            template: si van como nodos hermanos del <span> ("{m.prefijo}
+            <span>...</span> {m.sufijo}"), Prettier reformatea con saltos de
+            línea entre medio y ese whitespace del código fuente se colapsa en
+            un espacio visible ("+150" pasa a mostrar "+ 150"). Como contenido
+            CSS, no hay nodo de texto que whitespace-colapsar.
+
+            El <span> queda aria-hidden y el <p> lleva el aria-label con el
+            valor final ya armado: así un lector de pantalla no llega a leer
+            los valores intermedios mientras cuenta (ej. "63… 97… 112…").
+          */}
+          <p
+            class="font-display text-brand-600 text-5xl font-bold"
+            aria-label={`${m.prefijo}${m.valor}${m.sufijo}`}
+          >
+            <span
+              class="metric-count"
+              data-count-to={m.valor}
+              data-prefix={m.prefijo}
+              data-suffix={m.sufijo}
+              aria-hidden="true"
+            >
+              {m.valor}
+            </span>
+          </p>
+          <p class="text-muted mt-2 text-[15px]">{m.label}</p>
+        </li>
+      ))
+    }
+  </ul>
+
+  <SectionHeading
+    eyebrow="Por qué elegirnos"
+    title="Lo que nos diferencia"
+    class="mt-16"
+  />
+
+  <ul class="mt-14 grid grid-cols-1 gap-x-12 gap-y-14 lg:grid-cols-2">
+    {
+      diferenciales.map((item, i) => (
+        <li data-reveal style={`--reveal-delay: ${i * 80}ms`}>
+          <Icon
+            name={item.icon}
+            class="text-brand-600 size-8"
+            aria-hidden="true"
+          />
+          <h3 class="mt-5 text-xl font-semibold">{item.titulo}</h3>
+          <p class="text-muted mt-3 text-base leading-relaxed">{item.texto}</p>
+        </li>
+      ))
+    }
+  </ul>
+</Section>
+
+<style>
+  .metric-count::before {
+    content: attr(data-prefix);
+  }
+
+  .metric-count::after {
+    content: attr(data-suffix);
+  }
+</style>
+
+<script>
+  // Se observa la franja completa (no cada número por separado) para que los
+  // cuatro contadores arranquen todos juntos, apenas la mitad de la franja
+  // entra en pantalla — no cuando el primer número asoma por el borde.
+  const franja = document.querySelector<HTMLElement>('.metric-strip');
+  const contadores = document.querySelectorAll<HTMLElement>('[data-count-to]');
+  const prefiereMenosMovimiento = window.matchMedia(
+    '(prefers-reduced-motion: reduce)',
+  ).matches;
+
+  if (
+    franja &&
+    contadores.length &&
+    'IntersectionObserver' in window &&
+    !prefiereMenosMovimiento
+  ) {
+    const duracion = 500;
+
+    const animar = (el: HTMLElement) => {
+      const destino = Number(el.dataset.countTo);
+      const inicio = performance.now();
+      el.textContent = '0';
+
+      const tick = (ahora: number) => {
+        const progreso = Math.min((ahora - inicio) / duracion, 1);
+        const facilitado = 1 - Math.pow(1 - progreso, 3);
+        el.textContent = String(Math.round(destino * facilitado));
+        if (progreso < 1) requestAnimationFrame(tick);
+      };
+
+      requestAnimationFrame(tick);
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          contadores.forEach((el) => animar(el));
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.5 },
+    );
+
+    observer.observe(franja);
+  }
+</script>

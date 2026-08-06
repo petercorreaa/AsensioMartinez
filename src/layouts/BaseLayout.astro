@@ -1,0 +1,152 @@
+---
+// Poppins no tiene variante "variable" publicada — sólo se pide 700 (bold),
+// así que alcanza con el corte estático de ese único peso.
+import '@fontsource/poppins/700.css';
+import '@fontsource-variable/roboto';
+import '../styles/global.css';
+// Subset "latin" (no "-ext"): cubre el español y es la variante que el
+// navegador realmente elige para el <h1>. Precargarla evita que el H1 —
+// contenido crítico sobre el pliegue— espere a que el CSS termine de
+// parsearse antes de empezar a bajar la fuente.
+import poppinsLatinWoff2 from '@fontsource/poppins/files/poppins-latin-700-normal.woff2?url';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import WhatsAppFab from '../components/WhatsAppFab.astro';
+import { site } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Imagen para Open Graph, relativa a /public. Por defecto usa el og-default.jpg genérico del sitio. */
+  ogImage?: string;
+  /** Para páginas que no tienen que aparecer en buscadores, ej. /gracias. */
+  noindex?: boolean;
+}
+
+const {
+  title = `${site.nombre} — ${site.tagline}`,
+  description = `Estudio contable en ${site.ciudad}. Asesoramiento impositivo, laboral y societario para empresas, profesionales y monotributistas.`,
+  ogImage = '/img/og-default.jpg',
+  noindex = false,
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImageUrl = new URL(ogImage, Astro.site);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'AccountingService',
+  name: site.nombre,
+  description,
+  url: Astro.site?.href,
+  // Sin hardcodear: se derivan de site.ts, la misma regla que sigue el
+  // resto del sitio para cualquier dato de contacto.
+  telephone: site.telefonoHref.replace('tel:', ''),
+  foundingDate: String(site.fundacion),
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: site.direccion,
+    addressLocality: site.ciudad,
+    addressRegion: site.provincia,
+    addressCountry: 'AR',
+  },
+  areaServed: {
+    '@type': 'Country',
+    name: 'Argentina',
+  },
+};
+---
+
+<!doctype html>
+<html lang="es-AR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="icon" href="/favicon.png" type="image/png" sizes="512x512" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="canonical" href={canonical.href} />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href={poppinsLatinWoff2}
+      crossorigin="anonymous"
+    />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#13a6aa" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.nombre} />
+    <meta property="og:locale" content="es_AR" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+    <meta property="og:image" content={ogImageUrl.href} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl.href} />
+
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(jsonLd)}
+      is:inline
+    />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+    <Header />
+
+    <main id="contenido">
+      <slot />
+    </main>
+
+    <Footer />
+
+    <WhatsAppFab />
+
+    <script>
+      // Observer único de revelado al scroll, compartido por todo el sitio
+      // (ver la animación en global.css, bajo [data-reveal]). Sitio sin
+      // client-side router: cada navegación es una carga de página real, así
+      // que este script arranca de cero solo, sin nada especial que atender.
+      const prefiereMenosMovimiento = window.matchMedia(
+        '(prefers-reduced-motion: reduce)',
+      ).matches;
+      const elementos = document.querySelectorAll<HTMLElement>('[data-reveal]');
+
+      if (
+        elementos.length &&
+        !prefiereMenosMovimiento &&
+        'IntersectionObserver' in window
+      ) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.15, rootMargin: '0px 0px -10% 0px' },
+        );
+        elementos.forEach((el) => observer.observe(el));
+      } else {
+        elementos.forEach((el) => el.classList.add('is-visible'));
+      }
+    </script>
+  </body>
+</html>

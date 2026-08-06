@@ -1,0 +1,118 @@
+---
+import { Icon } from 'astro-icon/components';
+import Section from '../ui/Section.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import Button from '../ui/Button.astro';
+
+/*
+  Redacción tomada del listado original del estudio. Sólo se corrigió
+  ortografía y tildes: los nombres de las categorías y de cada ítem se
+  respetan tal cual, porque es la nomenclatura con la que trabajan.
+*/
+const categorias = [
+  {
+    titulo: 'Asesoramiento y capacitación',
+    items: [
+      'Optimización y estructura tributaria',
+      'Financiero y presupuestario',
+      'Impositivo',
+      'Administrativo y contable',
+    ],
+  },
+  {
+    titulo: 'Consultoría especializada',
+    items: ['Contable e impositiva', 'Laboral', 'Societaria'],
+  },
+  {
+    titulo: 'Gestión y supervisión',
+    items: [
+      'Liquidaciones impositivas',
+      'Financiera y ejecución presupuestaria',
+      'Outsourcing administrativo y contable',
+      'Recupero de saldos a favor',
+      'Liquidación de sueldos e indemnizaciones',
+      'Balances, estados contables consolidados y estados especiales',
+      'Constitución de sociedades comerciales (S.A., S.R.L., S.A.S.)',
+    ],
+  },
+  {
+    titulo: 'Desarrollos especiales',
+    items: [
+      'Diseño de sistemas de información administrativo-contables',
+      'Diseño de sistemas de control presupuestario y de gestión',
+    ],
+  },
+];
+---
+
+<Section id="servicios-completos" background="white" class="scroll-mt-32">
+  <SectionHeading
+    eyebrow="Todo lo que hacemos"
+    title="Servicios del estudio"
+    subtitle="Trabajamos con empresas, profesionales independientes y organismos públicos en las cuatro áreas de la práctica contable."
+  />
+
+  <div class="mt-14">
+    {
+      categorias.map((categoria, i) => (
+        <details
+          class="acordeon border-line border-b"
+          open={i === 0}
+          data-reveal
+          style={`--reveal-delay: ${i * 80}ms`}
+        >
+          <summary class="flex cursor-pointer items-center justify-between gap-6 py-6">
+            <h3 class="font-display text-xl font-semibold">
+              {categoria.titulo}
+            </h3>
+            <Icon
+              name="lucide:plus"
+              class="acordeon-icono text-accent-700 size-5 shrink-0 transition-transform duration-200"
+              aria-hidden="true"
+            />
+          </summary>
+
+          <ul class="grid grid-cols-1 gap-x-8 gap-y-3 pb-8 md:grid-cols-2">
+            {categoria.items.map((item) => (
+              <li class="flex items-start gap-3">
+                <Icon
+                  name="lucide:check"
+                  class="text-accent-700 mt-1.5 size-4 shrink-0"
+                  aria-hidden="true"
+                />
+                <span class="text-base">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </details>
+      ))
+    }
+  </div>
+
+  <div
+    class="bg-brand-50 mt-12 flex flex-col items-start gap-5 p-6 sm:flex-row sm:items-center sm:justify-between"
+  >
+    <p class="text-base">
+      ¿No encontrás lo que buscás? Contanos tu caso y te decimos si podemos
+      ayudarte.
+    </p>
+    <Button href="/#contacto" variant="secondary" class="shrink-0">
+      Consultanos
+    </Button>
+  </div>
+</Section>
+
+<style>
+  /* Saca el triangulito nativo en Chrome/Safari y en Firefox */
+  .acordeon summary {
+    list-style: none;
+  }
+
+  .acordeon summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .acordeon[open] .acordeon-icono {
+    transform: rotate(45deg);
+  }
+</style>

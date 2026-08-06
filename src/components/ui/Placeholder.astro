@@ -1,0 +1,31 @@
+---
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  /** Texto que describe la imagen que va a ir acá */
+  label: string;
+  /** Relación de aspecto CSS, ej. "16/9", "4/3", "1/1". Por defecto 16/9. */
+  ratio?: string;
+  class?: string;
+}
+
+const { label, ratio = '16/9', class: className } = Astro.props;
+
+const classes = [
+  'flex flex-col items-center justify-center gap-3',
+  'border-2 border-dashed border-brand-200 bg-brand-50 p-6 text-center',
+  className,
+]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<div
+  class={classes}
+  style={`aspect-ratio: ${ratio};`}
+  role="img"
+  aria-label={label}
+>
+  <Icon name="lucide:image" class="text-brand-600 size-8" aria-hidden="true" />
+  <span class="text-muted max-w-[36ch] text-sm leading-snug">{label}</span>
+</div>

@@ -1,0 +1,415 @@
+---
+import { Icon } from 'astro-icon/components';
+import Section from '../ui/Section.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import Card from '../ui/Card.astro';
+import Button from '../ui/Button.astro';
+import { site, direccionCompleta } from '../../data/site';
+
+// Para mostrar en pantalla, el pedido es la forma corta (sin país). Para las
+// URLs de Maps sí conviene la dirección completa (con país): es más precisa
+// para el geocoder de Google y evita ambigüedad con calles homónimas.
+const direccionCorta = `${site.direccion}, ${site.ciudad}, ${site.provincia}`;
+const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccionCompleta)}`;
+---
+
+<Section id="contacto" background="tint" class="scroll-mt-32">
+  <SectionHeading
+    eyebrow="Contacto"
+    title="Contanos tu caso"
+    subtitle="Completá el formulario o escribinos por WhatsApp y coordinamos una primera reunión sin cargo. Te respondemos dentro de las 24 horas hábiles."
+  />
+
+  {
+    /*
+    7/5: el formulario necesita más ancho que la columna de datos (si no,
+    los campos quedan incómodamente angostos), así que va en 7 de 12 y los
+    datos + el mapa se apilan en los 5 restantes.
+  */
+  }
+  <div class="mt-14 grid grid-cols-1 gap-8 lg:grid-cols-12">
+    {/* ---------------- Columna izquierda: formulario ---------------- */}
+    <div class="lg:col-span-7">
+      <Card padding="lg" class="h-full">
+        <h3 class="font-display text-2xl">Trabajemos en equipo</h3>
+
+        {
+          /*
+          Campos calcados del formulario que hoy está en producción
+          (asensiomartinez.com.ar, hecho con WPForms): nombre, apellidos,
+          teléfono, correo y consulta — todos obligatorios, como allá.
+
+          NO se replicó un sexto campo de texto que allá aparece entre
+          "Apellidos" y "Teléfono" con la etiqueta "Consulta Nombre Correo":
+          es texto de etiqueta pegado por error, no un campo real.
+        */
+        }
+        <form
+          id="form-contacto"
+          action="https://api.web3forms.com/submit"
+          method="POST"
+          class="mt-6 flex flex-col gap-6"
+        >
+          {
+            /*
+            TODO: reemplazar por la access key real del estudio. Se saca
+            gratis y sin registro en https://web3forms.com — Web3Forms está
+            pensado para que esta key viva en el HTML público: no es un
+            secreto, así que no hace falta moverla a una variable de entorno.
+            La protección antispam corre del lado de su servidor (dominios
+            permitidos, límite de envíos) y acá, del honeypot de abajo.
+
+            OJO: mientras la key sea el placeholder, el formulario valida y
+            envía pero Web3Forms rechaza el POST — no llega ningún mail.
+          */
+          }
+          <input
+            type="hidden"
+            name="access_key"
+            value="REEMPLAZAR_CON_ACCESS_KEY"
+          />
+          <input type="hidden" name="redirect" value="/gracias" />
+          <input
+            type="hidden"
+            name="subject"
+            value="Nueva consulta desde la web"
+          />
+
+          {
+            /* Honeypot: un campo de más que sólo un bot completaría. Web3Forms descarta el envío si llega con datos. */
+          }
+          <input
+            type="checkbox"
+            name="botcheck"
+            class="hidden"
+            tabindex="-1"
+            autocomplete="off"
+          />
+
+          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div class="campo">
+              <label for="nombre">Nombre</label>
+              <input
+                id="nombre"
+                name="nombre"
+                type="text"
+                placeholder="María"
+                autocomplete="given-name"
+                required
+              />
+              <p class="campo-error">Completá tu nombre.</p>
+            </div>
+
+            <div class="campo">
+              <label for="apellidos">Apellidos</label>
+              <input
+                id="apellidos"
+                name="apellidos"
+                type="text"
+                placeholder="Gómez"
+                autocomplete="family-name"
+                required
+              />
+              <p class="campo-error">Completá tus apellidos.</p>
+            </div>
+          </div>
+
+          <div class="campo">
+            <label for="telefono">Teléfono</label>
+            <input
+              id="telefono"
+              name="telefono"
+              type="tel"
+              placeholder="221 555-0100"
+              autocomplete="tel"
+              required
+            />
+            <p class="campo-error">Ingresá un teléfono válido.</p>
+          </div>
+
+          <div class="campo">
+            <label for="email">Correo electrónico</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="tu@email.com"
+              autocomplete="email"
+              required
+            />
+            <p class="campo-error">Ingresá un email válido.</p>
+          </div>
+
+          <div class="campo">
+            <label for="consulta">Consulta</label>
+            <textarea
+              id="consulta"
+              name="consulta"
+              rows="5"
+              placeholder="Contanos brevemente tu situación."
+              required></textarea>
+            <p class="campo-error">Contanos brevemente tu consulta.</p>
+          </div>
+
+          <Button
+            type="submit"
+            id="form-contacto-submit"
+            variant="primary"
+            size="lg"
+            class="w-full"
+          >
+            Enviar
+          </Button>
+        </form>
+      </Card>
+    </div>
+
+    {/* ---------------- Columna derecha: datos + mapa ---------------- */}
+    <div class="flex flex-col gap-8 lg:col-span-5">
+      <Card padding="lg" class="flex flex-col">
+        <ul class="flex flex-col gap-5">
+          <li class="flex items-start gap-3">
+            <Icon
+              name="lucide:map-pin"
+              class="text-brand-600 mt-0.5 size-5 shrink-0"
+              aria-hidden="true"
+            />
+            <span>{direccionCorta}</span>
+          </li>
+
+          <li class="flex items-center gap-3">
+            <Icon
+              name="lucide:phone"
+              class="text-brand-600 size-5 shrink-0"
+              aria-hidden="true"
+            />
+            <a href={site.telefonoHref} class="hover:text-accent-700">
+              {site.telefono}
+            </a>
+          </li>
+
+          {
+            /*
+            "destacado" respecto de los demás datos: fondo brand-50 propio,
+            en vez del list-item liso que usan dirección/teléfono/horario.
+          */
+          }
+          <li class="bg-brand-50 -mx-2 flex items-center gap-3 px-2 py-2">
+            <Icon
+              name="simple-icons:whatsapp"
+              class="size-5 shrink-0 text-[#25D366]"
+              aria-hidden="true"
+            />
+            <a
+              href={site.whatsappHref}
+              target="_blank"
+              rel="noopener"
+              class="text-accent-700 hover:text-accent-800 font-semibold"
+            >
+              {site.whatsapp}
+            </a>
+          </li>
+
+          <li class="flex items-center gap-3">
+            <Icon
+              name="lucide:clock"
+              class="text-brand-600 size-5 shrink-0"
+              aria-hidden="true"
+            />
+            <span>{site.horario}</span>
+          </li>
+        </ul>
+        {
+          /* TODO: sumar el email cuando el estudio lo confirme (ver site.ts). */
+        }
+
+        <Button
+          href={site.whatsappHref}
+          target="_blank"
+          rel="noopener"
+          variant="primary"
+          size="lg"
+          class="mt-8 w-full"
+        >
+          <Icon
+            name="simple-icons:whatsapp"
+            class="size-5 shrink-0"
+            aria-hidden="true"
+          />
+          Escribinos por WhatsApp
+        </Button>
+      </Card>
+
+      {
+        /*
+        div plano, no <Card>: un <!-- --> comentado como hijo del slot de un
+        componente Astro se borra en la compilación (lo verifiqué con un
+        repro aislado), aunque el mismo comentario sobrevive intacto como
+        hijo de un elemento HTML normal. Las clases de acá replican a mano
+        las de Card.astro para mantener el mismo look.
+      */
+      }
+      <div
+        class="group border-line shadow-soft hover:border-accent-700 relative aspect-[4/3] overflow-hidden border bg-white transition-[border-color,transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 lg:aspect-auto lg:min-h-[280px] lg:flex-1"
+      >
+        {
+          /*
+          aspect-[4/3] en mobile (una sola columna, la caja define su propia
+          altura como cualquier imagen). En desktop manda lg:flex-1: esta
+          columna es un grid item —o sea que el grid ya la estira a la altura
+          del formulario de al lado— y el mapa se come todo el alto que sobra
+          debajo de la card de datos. El min-h evita que quede aplastado si
+          alguna vez el formulario queda más corto que la card.
+
+          El iframe adentro es simplemente h-full w-full: como quien fija el
+          tamaño es este contenedor y no un hijo con aspect-ratio propio, no
+          hace falta la vuelta de absolute/inset-0 que hacía falta con el
+          <Placeholder />.
+
+          loading="lazy" en el iframe: el embed de Google Maps mete cookies
+          y trackers de terceros, así que no tiene sentido cargarlo hasta
+          que esté por entrar en pantalla.
+        */
+        }
+        <iframe
+          src={`https://maps.google.com/maps?q=${encodeURIComponent(direccionCompleta)}&output=embed`}
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title={`Mapa - ${direccionCompleta}`}
+          class="block h-full w-full border-0"></iframe>
+
+        {
+          /*
+          pointer-events-none en el wrapper, pointer-events-auto de vuelta en
+          el botón: si no, este div — aunque sólo se VE el botón en el
+          centro — igual tapa el resto de la caja y no dejaría arrastrar ni
+          hacer zoom en el mapa de abajo.
+        */
+        }
+        <div
+          class="pointer-events-none absolute inset-0 flex items-center justify-center"
+        >
+          <Button
+            href={mapsHref}
+            target="_blank"
+            rel="noopener"
+            variant="primary"
+            class="pointer-events-auto"
+          >
+            <Icon name="lucide:navigation" class="size-4" aria-hidden="true" />
+            Cómo llegar
+          </Button>
+        </div>
+      </div>
+    </div>
+  </div>
+</Section>
+
+<style>
+  .campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .campo label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-navy-900);
+  }
+
+  /*
+    Sin border-radius: el sistema es de esquinas vivas (ver AGENTS.md). Los
+    inputs heredan la fuente del body a mano porque el reset de Tailwind los
+    deja con la del sistema.
+  */
+  .campo input[type='text'],
+  .campo input[type='email'],
+  .campo input[type='tel'],
+  .campo textarea {
+    border: 1px solid var(--color-line);
+    padding: 12px 16px;
+    font-size: 16px;
+    font-family: inherit;
+    color: var(--color-ink);
+    background-color: #ffffff;
+    transition:
+      border-color 200ms ease,
+      box-shadow 200ms ease;
+  }
+
+  .campo textarea {
+    resize: vertical;
+  }
+
+  /*
+    outline: none acá porque el ring de abajo (box-shadow) ya es un indicador
+    de foco visible por sí solo — dejar además el outline genérico del sitio
+    sumaría un segundo contorno redundante sobre un control que ya cambia de
+    borde y gana un halo.
+  */
+  .campo input:focus-visible,
+  .campo textarea:focus-visible {
+    outline: none;
+    border-color: var(--color-brand-600);
+    box-shadow: 0 0 0 3px var(--color-brand-100);
+  }
+
+  .campo input::placeholder,
+  .campo textarea::placeholder {
+    color: var(--color-muted);
+    opacity: 0.7;
+  }
+
+  /*
+    :user-invalid, no :invalid: :invalid marca en rojo un campo requerido
+    apenas carga la página, antes de que el usuario haya tocado nada.
+    :user-invalid sólo se activa después de que interactuó con el campo (o
+    intentó enviar el formulario).
+  */
+  .campo input:user-invalid,
+  .campo textarea:user-invalid {
+    border-color: #dc2626;
+  }
+
+  .campo-error {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #dc2626;
+  }
+
+  .campo-error::before {
+    content: '';
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23dc2626' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='12' y1='8' x2='12' y2='12'/%3E%3Cline x1='12' y1='16' x2='12.01' y2='16'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+
+  .campo input:user-invalid ~ .campo-error,
+  .campo textarea:user-invalid ~ .campo-error {
+    display: flex;
+  }
+</style>
+
+<script>
+  const formulario = document.getElementById(
+    'form-contacto',
+  ) as HTMLFormElement | null;
+  const boton = document.getElementById(
+    'form-contacto-submit',
+  ) as HTMLButtonElement | null;
+
+  formulario?.addEventListener('submit', () => {
+    // Si el submit llegó hasta acá, la validación nativa ya lo dejó pasar:
+    // el navegador no dispara 'submit' en un form inválido.
+    if (boton) {
+      boton.disabled = true;
+      boton.textContent = 'Enviando…';
+    }
+  });
+</script>

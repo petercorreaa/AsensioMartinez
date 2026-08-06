@@ -1,0 +1,38 @@
+---
+import { getCollection } from 'astro:content';
+import type { GetStaticPathsOptions, Page } from 'astro';
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import NovedadesListado from '../../../../components/sections/NovedadesListado.astro';
+import {
+  CATEGORIAS,
+  slugCategoria,
+  categoriaDesdeSlug,
+  ordenarPorFecha,
+  type Novedad,
+} from '../../../../lib/novedades';
+
+export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
+  const todas = await getCollection('novedades');
+  return CATEGORIAS.flatMap((categoria) => {
+    const filtradas = ordenarPorFecha(
+      todas.filter((n) => n.data.categoria === categoria),
+    );
+    return paginate(filtradas, {
+      pageSize: 9,
+      params: { categoria: slugCategoria(categoria) },
+    });
+  });
+}
+
+const { page } = Astro.props as { page: Page<Novedad> };
+// categoriaDesdeSlug siempre resuelve acá: el slug viene de CATEGORIAS vía
+// slugCategoria() en getStaticPaths, así que nunca es un valor arbitrario.
+const categoria = categoriaDesdeSlug(Astro.params.categoria!)!;
+---
+
+<BaseLayout
+  title={`Novedades de ${categoria} — Asensio Martínez`}
+  description={`Los cambios en normativa ${categoria.toLowerCase()} que publicamos hasta ahora.`}
+>
+  <NovedadesListado page={page} categoriaActiva={categoria} />
+</BaseLayout>

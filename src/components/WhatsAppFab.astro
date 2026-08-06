@@ -1,0 +1,92 @@
+---
+import { Icon } from 'astro-icon/components';
+import { site } from '../data/site';
+---
+
+<div
+  id="whatsapp-fab-sentinel"
+  class="absolute top-[400px] left-0 h-px w-px"
+  aria-hidden="true"
+>
+</div>
+
+<a
+  id="whatsapp-fab"
+  href={site.whatsappHref}
+  target="_blank"
+  rel="noopener"
+  aria-label="Escribinos por WhatsApp"
+  class="group fixed right-6 bottom-6 z-40 flex h-14 items-center overflow-hidden rounded-full bg-[#25D366] text-white shadow-lg md:right-7 md:bottom-7"
+>
+  <span class="flex h-14 w-14 shrink-0 items-center justify-center">
+    <Icon name="simple-icons:whatsapp" class="size-7" aria-hidden="true" />
+  </span>
+  {
+    /*
+    text-navy-900 explícito: blanco (heredado del <a>) sobre #25D366 da
+    ~1.98:1, muy por debajo del 4.5:1 que necesita este texto de 15px.
+    navy-900 sobre el mismo verde da ~8:1. El ícono se queda blanco (es un
+    ícono de marca, no texto).
+  */
+  }
+  <span
+    class="text-navy-900 max-w-0 overflow-hidden pr-0 text-[15px] font-semibold whitespace-nowrap opacity-0 transition-[max-width,opacity,padding-right] duration-200 group-hover:max-w-[220px] group-hover:pr-5 group-hover:opacity-100"
+  >
+    Escribinos por WhatsApp
+  </span>
+</a>
+
+<style>
+  #whatsapp-fab {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(calc(var(--fab-lift, 0px) * -1)) scale(0.75);
+    transition:
+      opacity 200ms ease,
+      transform 200ms ease;
+  }
+
+  #whatsapp-fab.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(calc(var(--fab-lift, 0px) * -1)) scale(1);
+  }
+
+  :global(html.mobile-menu-open) #whatsapp-fab {
+    opacity: 0;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  const fab = document.getElementById('whatsapp-fab');
+  const revealSentinel = document.getElementById('whatsapp-fab-sentinel');
+
+  if (fab && 'IntersectionObserver' in window) {
+    if (revealSentinel) {
+      const revealObserver = new IntersectionObserver(
+        ([entry]) => {
+          fab.classList.toggle('is-visible', !entry.isIntersecting);
+        },
+        { threshold: 0 },
+      );
+      revealObserver.observe(revealSentinel);
+    }
+
+    const footer = document.querySelector('footer');
+    if (footer) {
+      const steps = 20;
+      const threshold = Array.from({ length: steps + 1 }, (_, i) => i / steps);
+      const footerObserver = new IntersectionObserver(
+        ([entry]) => {
+          fab.style.setProperty(
+            '--fab-lift',
+            `${entry.intersectionRect.height}px`,
+          );
+        },
+        { threshold },
+      );
+      footerObserver.observe(footer);
+    }
+  }
+</script>

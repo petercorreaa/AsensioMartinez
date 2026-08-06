@@ -1,0 +1,142 @@
+---
+import { Icon } from 'astro-icon/components';
+import Section from '../ui/Section.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import { whatsappLink } from '../../data/site';
+
+const preguntas = [
+  {
+    pregunta: '¿Atienden clientes de otras provincias?',
+    respuesta:
+      'Sí. Trabajamos de forma digital con clientes de todo el país. Las reuniones pueden ser presenciales en nuestra oficina de La Plata o por videollamada, como te quede más cómodo.',
+  },
+  {
+    pregunta: '¿Cómo son los honorarios?',
+    respuesta:
+      'Depende del alcance del trabajo. Después de la primera reunión te pasamos una propuesta por escrito con el detalle de lo que incluye y el monto mensual o por trabajo, según el caso. No hay costos ocultos ni adicionales sorpresa.',
+  },
+  {
+    pregunta: 'Ya tengo contador. ¿Es complicado cambiar?',
+    respuesta:
+      'No. Nos ocupamos nosotros de pedir la documentación, revisar que esté todo en orden y hacer la transición sin que se te pase ningún vencimiento. Es más simple de lo que parece y lo hicimos muchas veces.',
+  },
+  {
+    pregunta: '¿Cuánto tarda constituir una S.A.S. o una S.R.L.?',
+    respuesta:
+      'Los plazos dependen del organismo y del tipo societario. Apenas nos contás tu caso te damos una estimación realista, y te avisamos en cada etapa en qué estado está el trámite.',
+  },
+  {
+    pregunta: '¿Trabajan con monotributistas y profesionales independientes?',
+    respuesta:
+      'Sí. Atendemos desde profesionales independientes y monotributistas hasta PyMEs y sociedades con estructura compleja.',
+  },
+  {
+    pregunta: '¿Cómo les hago llegar la documentación?',
+    respuesta:
+      'De forma digital. Te damos una carpeta compartida donde vas subiendo comprobantes y documentación, y nosotros la procesamos desde ahí. Si preferís acercarla en papel, también podés.',
+  },
+];
+
+// El footer ya enlaza acá con #preguntas-frecuentes: el id tiene que coincidir.
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: preguntas.map((p) => ({
+    '@type': 'Question',
+    name: p.pregunta,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: p.respuesta,
+    },
+  })),
+};
+---
+
+<Section id="preguntas-frecuentes" background="white" class="scroll-mt-32">
+  <div class="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+    <div class="lg:col-span-5">
+      {
+        /*
+        lg:sticky con lg:top-36: la columna izquierda queda pegada al bajar,
+        mientras la derecha (más alta, 6 preguntas) sigue scrolleando. top-36
+        (144px) deja aire debajo del header sticky (112px + 1px de borde).
+      */
+      }
+      <div class="lg:sticky lg:top-36">
+        <SectionHeading
+          eyebrow="Preguntas frecuentes"
+          title="Lo que nos suelen preguntar"
+        />
+
+        <div class="border-line mt-8 flex items-center gap-3 border p-5">
+          <Icon
+            name="simple-icons:whatsapp"
+            class="size-5 shrink-0 text-[#25D366]"
+            aria-hidden="true"
+          />
+          <p class="text-[15px]">
+            ¿Te quedó otra duda?
+            <a
+              href={whatsappLink(
+                'Hola, tengo una consulta que no encontré en las preguntas frecuentes',
+              )}
+              target="_blank"
+              rel="noopener"
+              class="text-accent-700 hover:text-accent-800 font-semibold underline underline-offset-2"
+            >
+              Escribinos por WhatsApp
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="lg:col-span-7">
+      {
+        preguntas.map((p, i) => (
+          <details
+            class="acordeon border-line border-b"
+            open={i === 0}
+            data-reveal
+            style={`--reveal-delay: ${i * 80}ms`}
+          >
+            <summary class="flex cursor-pointer items-center justify-between gap-6 py-6">
+              <h3 class="font-display text-lg font-semibold md:text-xl">
+                {p.pregunta}
+              </h3>
+              <Icon
+                name="lucide:plus"
+                class="acordeon-icono text-accent-700 size-5 shrink-0 transition-transform duration-200"
+                aria-hidden="true"
+              />
+            </summary>
+            <p class="text-muted pb-8 text-base leading-relaxed">
+              {p.respuesta}
+            </p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(faqJsonLd)}
+    is:inline
+  />
+</Section>
+
+<style>
+  /* Saca el triangulito nativo en Chrome/Safari y en Firefox */
+  .acordeon summary {
+    list-style: none;
+  }
+
+  .acordeon summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .acordeon[open] .acordeon-icono {
+    transform: rotate(45deg);
+  }
+</style>

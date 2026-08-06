@@ -1,0 +1,41 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+type Background = 'white' | 'tint' | 'navy';
+
+interface Props extends HTMLAttributes<'section'> {
+  id?: string;
+  background?: Background;
+  /** Clases extra para el contenedor interno */
+  containerClass?: string;
+}
+
+const {
+  id,
+  background = 'white',
+  containerClass,
+  class: className,
+  ...rest
+} = Astro.props;
+
+// El punteado va como background-image aparte de bg-brand-50 (background-
+// color): son propiedades distintas, así que conviven en la misma clase sin
+// que una pise a la otra en la cascada. 3% de brand-600, grilla de 24px.
+const backgrounds: Record<Background, string> = {
+  white: 'bg-white text-ink',
+  tint: 'bg-brand-50 text-ink bg-[radial-gradient(circle,rgba(19,166,170,0.03)_1.5px,transparent_1.5px)] bg-[length:24px_24px]',
+  navy: 'bg-navy-900 text-white',
+};
+
+const classes = ['py-20 md:py-28', backgrounds[background], className]
+  .filter(Boolean)
+  .join(' ');
+
+const inner = ['container-xl', containerClass].filter(Boolean).join(' ');
+---
+
+<section id={id} class={classes} data-bg={background} {...rest}>
+  <div class={inner}>
+    <slot />
+  </div>
+</section>

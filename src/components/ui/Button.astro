@@ -1,0 +1,77 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+type Variant = 'primary' | 'secondary' | 'ghost' | 'inverse';
+type Size = 'md' | 'lg';
+
+type Props = {
+  variant?: Variant;
+  size?: Size;
+} & (
+  | ({ href: string; type?: never } & HTMLAttributes<'a'>)
+  | ({
+      href?: never;
+      type?: 'button' | 'submit' | 'reset';
+    } & HTMLAttributes<'button'>)
+);
+
+const {
+  variant = 'primary',
+  size = 'md',
+  href,
+  type = 'button',
+  class: className,
+  ...rest
+} = Astro.props;
+
+const base =
+  'inline-flex items-center justify-center gap-2 font-sans font-semibold text-center no-underline transition-[background-color,border-color,color,transform,outline-color] duration-200 cursor-pointer active:translate-y-px disabled:pointer-events-none disabled:opacity-50';
+
+/**
+ * Contraste (WCAG AA):
+ * - primary   brand-600 #13a6aa + blanco       → 2.97:1 ⚠️
+ *             Por debajo del mínimo de 4.5:1 para texto normal (incluso del
+ *             3:1 de texto grande/UI). Decisión de marca a propósito: el
+ *             primario tiene que ser #13a6aa en todos lados, sin excepción
+ *             para los botones — no usar brand-700 acá aunque contraste
+ *             mejor, salvo que se vuelva a pedir explícitamente.
+ * - secondary accent-700 #225578 sobre blanco  → 7.98:1 ✅
+ * - ghost     accent-700 #225578 sobre blanco  → 7.98:1 ✅
+ * - inverse   navy-900 sobre blanco/brand-50   → 15.6:1 / ~14:1 ✅
+ *             (para usar "primary" sobre fondos oscuros, ej. navy-900,
+ *             donde el primary normal —brand sobre navy— no se vería)
+ */
+const variants: Record<Variant, string> = {
+  primary:
+    'bg-brand-600 text-white border border-brand-600 hover:bg-brand-700 hover:border-brand-700 active:bg-brand-800 active:border-brand-800 focus-visible:outline-brand-800',
+  secondary:
+    'bg-white text-accent-700 border border-accent-700 hover:bg-accent-50',
+  ghost:
+    'bg-transparent text-accent-700 border border-transparent hover:bg-accent-50 hover:text-accent-800',
+  inverse:
+    'bg-white text-navy-900 border border-white hover:bg-brand-50 hover:border-brand-50',
+};
+
+// py-3 (12px) medía 41-42px de alto total en la práctica: unos pixeles por
+// debajo del área táctil mínima de 44px. py-3.5 (14px) lo deja en ~45px.
+const sizes: Record<Size, string> = {
+  md: 'text-[15px] leading-none px-5 py-3.5',
+  lg: 'text-base leading-none px-7 py-4',
+};
+
+const classes = [base, variants[variant], sizes[size], className]
+  .filter(Boolean)
+  .join(' ');
+---
+
+{
+  href ? (
+    <a href={href} class={classes} {...(rest as HTMLAttributes<'a'>)}>
+      <slot />
+    </a>
+  ) : (
+    <button type={type} class={classes} {...(rest as HTMLAttributes<'button'>)}>
+      <slot />
+    </button>
+  )
+}

@@ -1,0 +1,290 @@
+---
+import { getCollection, render } from 'astro:content';
+import { Icon } from 'astro-icon/components';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Section from '../../components/ui/Section.astro';
+import Button from '../../components/ui/Button.astro';
+import NovedadCard from '../../components/NovedadCard.astro';
+import { site, whatsappLink } from '../../data/site';
+import {
+  formatFecha,
+  tiempoLectura,
+  relacionadas,
+  slugCategoria,
+  type Novedad,
+} from '../../lib/novedades';
+
+export async function getStaticPaths() {
+  const entradas = await getCollection('novedades');
+  return entradas.map((entrada) => ({
+    params: { slug: entrada.id },
+    props: { entrada },
+  }));
+}
+
+interface Props {
+  entrada: Novedad;
+}
+
+const { entrada } = Astro.props;
+const { titulo, resumen, fecha, categoria, autor, imagen } = entrada.data;
+const { Content } = await render(entrada);
+
+const todas = await getCollection('novedades');
+const relacionadasConEsta = relacionadas(entrada, todas, 2);
+
+const minutos = tiempoLectura(entrada.body ?? '');
+const canonical = new URL(Astro.url.pathname, Astro.site);
+
+// Si la nota no tiene foto propia todavía, usamos el og-default como imagen
+// representativa: Google exige `image` para que un Article sea elegible
+// para rich results, y no tener nada es peor que una imagen genérica.
+const imagenArticulo = new URL(
+  imagen ? imagen.src : '/img/og-default.jpg',
+  Astro.site,
+).href;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: titulo,
+  description: resumen,
+  image: imagenArticulo,
+  datePublished: fecha.toISOString(),
+  // No hay fecha de última edición trackeada en el schema todavía: usamos
+  // la misma que datePublished en vez de omitir el campo.
+  dateModified: fecha.toISOString(),
+  author: {
+    '@type': 'Organization',
+    name: autor,
+  },
+  // TODO: sumar publisher.logo (mínimo 112×112, recomendado por Google)
+  // cuando exista el logo real — apuntarlo al og-default (1200×630, no
+  // cuadrado) sería estructuralmente incorrecto para este campo.
+  publisher: {
+    '@type': 'Organization',
+    name: site.nombre,
+  },
+  mainEntityOfPage: canonical.href,
+};
+---
+
+<BaseLayout title={`${titulo} — ${site.nombre}`} description={resumen}>
+  <Section background="white">
+    {
+      /*
+      max-w-[68ch] va en un div propio, no como containerClass de <Section>:
+      ese prop se concatena con container-xl (max-width: 1200px) en el MISMO
+      elemento, y ya me pasó varias veces en este build que dos utilidades
+      compitiendo por la misma propiedad ganan según el orden en que Tailwind
+      las emite en la hoja compilada, no según el orden en el atributo class.
+      Anidar evita la pelea: cada max-width vive en su propio elemento.
+    */
+    }
+    <div class="mx-auto max-w-[68ch]">
+      <nav
+        aria-label="Breadcrumb"
+        class="text-muted flex flex-wrap gap-2 text-sm"
+      >
+        <a href="/" class="hover:text-accent-700">Inicio</a>
+        <span aria-hidden="true">/</span>
+        <a href="/novedades" class="hover:text-accent-700">Novedades</a>
+        <span aria-hidden="true">/</span>
+        <span class="text-ink" aria-current="page">{titulo}</span>
+      </nav>
+
+      <div class="mt-8">
+        <a
+          href={`/novedades/categoria/${slugCategoria(categoria)}`}
+          class="bg-accent-50 text-accent-700 hover:bg-accent-600/10 inline-block px-3 py-1 text-xs font-semibold tracking-wide uppercase transition-colors duration-200"
+        >
+          {categoria}
+        </a>
+
+        <h1 class="mt-5 text-4xl md:text-5xl">{titulo}</h1>
+
+        <div
+          class="text-muted mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm"
+        >
+          <time datetime={fecha.toISOString()}>{formatFecha(fecha)}</time>
+          <span aria-hidden="true">·</span>
+          <span>{autor}</span>
+          <span aria-hidden="true">·</span>
+          <span>{minutos} min de lectura</span>
+        </div>
+      </div>
+
+      <div class="article-body mt-10">
+        <Content />
+      </div>
+
+      <div class="bg-brand-50 mt-16 p-8 text-center">
+        <p class="text-navy-900 text-xl font-semibold">
+          ¿Esto te afecta? Consultanos.
+        </p>
+        <p class="text-muted mt-2">
+          Contanos tu situación y te decimos cómo seguir.
+        </p>
+        <Button
+          href={whatsappLink(
+            `Hola, tengo una consulta sobre la nota "${titulo}"`,
+          )}
+          target="_blank"
+          rel="noopener"
+          variant="primary"
+          size="lg"
+          class="mt-6"
+        >
+          <Icon
+            name="simple-icons:whatsapp"
+            class="size-5"
+            aria-hidden="true"
+          />
+          Escribinos por WhatsApp
+        </Button>
+      </div>
+    </div>
+  </Section>
+
+  {
+    relacionadasConEsta.length > 0 && (
+      <Section background="tint">
+        <h2 class="text-2xl">También te puede interesar</h2>
+        <ul class="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2">
+          {relacionadasConEsta.map((relacionada) => (
+            <li>
+              <NovedadCard novedad={relacionada} />
+            </li>
+          ))}
+        </ul>
+      </Section>
+    )
+  }
+
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(jsonLd)}
+    is:inline
+  />
+</BaseLayout>
+
+<style is:global>
+  /*
+    Estilos "a mano" del cuerpo de la nota, sin @tailwindcss/typography.
+    is:global (no scoped) a propósito: <Content /> renderiza el markdown a
+    través de un componente Astro generado aparte por las Content
+    Collections, con su propio hash de scoping — un <style> scoped acá no
+    llega a esos elementos aunque parezcan estar "adentro" de este archivo.
+  */
+  .article-body h2 {
+    margin-top: 48px;
+    margin-bottom: 16px;
+    font-size: 32px;
+    line-height: 1.2;
+  }
+
+  .article-body h3 {
+    margin-top: 36px;
+    margin-bottom: 12px;
+    font-size: 24px;
+    line-height: 1.25;
+  }
+
+  .article-body p {
+    margin-top: 20px;
+    font-size: 18px;
+    line-height: 1.7;
+  }
+
+  .article-body p:first-child {
+    margin-top: 0;
+  }
+
+  .article-body a {
+    color: var(--color-accent-700);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .article-body a:hover {
+    color: var(--color-accent-800);
+  }
+
+  .article-body ul,
+  .article-body ol {
+    margin-top: 20px;
+    padding-left: 1.25em;
+    font-size: 18px;
+    line-height: 1.7;
+  }
+
+  .article-body ul {
+    list-style-type: disc;
+  }
+
+  .article-body ol {
+    list-style-type: decimal;
+  }
+
+  .article-body li + li {
+    margin-top: 8px;
+  }
+
+  .article-body ul > li::marker {
+    color: var(--color-brand-600);
+  }
+
+  .article-body ol > li::marker {
+    color: var(--color-brand-600);
+    font-weight: 700;
+  }
+
+  .article-body blockquote {
+    margin-top: 24px;
+    border-left: 3px solid var(--color-accent-700);
+    padding-left: 20px;
+    font-style: italic;
+    color: var(--color-muted);
+  }
+
+  /*
+    display:block + overflow-x:auto en la tabla misma: en mobile una tabla de
+    3+ columnas no entra en 350px útiles y, sin esto, desborda todo el
+    documento en vez de scrollear sólo ella. <thead>/<tbody>/<tr> siguen
+    generando su caja de tabla igual (esas reglas de display no dependen de
+    que el ancestro <table> conserve display:table), así que la grilla no se
+    rompe.
+  */
+  .article-body table {
+    display: block;
+    overflow-x: auto;
+    margin-top: 24px;
+    max-width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+  }
+
+  .article-body th,
+  .article-body td {
+    border: 1px solid var(--color-line);
+    padding: 10px 14px;
+    text-align: left;
+  }
+
+  .article-body th {
+    background-color: var(--color-brand-50);
+    font-family: var(--font-display);
+    font-weight: 700;
+  }
+
+  .article-body strong {
+    font-weight: 700;
+    color: var(--color-navy-900);
+  }
+
+  .article-body hr {
+    margin-block: 32px;
+    border: none;
+    border-top: 1px solid var(--color-line);
+  }
+</style>

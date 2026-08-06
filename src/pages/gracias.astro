@@ -1,0 +1,51 @@
+---
+import { Icon } from 'astro-icon/components';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/ui/Section.astro';
+import Button from '../components/ui/Button.astro';
+import { site, whatsappLink } from '../data/site';
+---
+
+<BaseLayout
+  title={`Recibimos tu consulta — ${site.nombre}`}
+  description="Recibimos tu consulta. Te respondemos dentro de las 24 horas hábiles."
+  noindex
+>
+  <Section background="white" class="min-h-[60vh]">
+    <div class="mx-auto flex max-w-lg flex-col items-center text-center">
+      <Icon
+        name="lucide:check-circle"
+        class="text-brand-600 size-16"
+        aria-hidden="true"
+      />
+
+      <h1 class="mt-6 text-4xl">Recibimos tu consulta</h1>
+
+      <p class="text-muted mt-4 text-lg">
+        Te vamos a responder dentro de las 24 horas hábiles. Si es urgente,
+        escribinos por WhatsApp.
+      </p>
+
+      <div class="mt-8 flex flex-col items-center gap-4 sm:flex-row">
+        <Button
+          href={whatsappLink('Hola, envié una consulta desde la web')}
+          target="_blank"
+          rel="noopener"
+          variant="primary"
+          size="lg"
+        >
+          <Icon
+            name="simple-icons:whatsapp"
+            class="size-5"
+            aria-hidden="true"
+          />
+          Escribinos por WhatsApp
+        </Button>
+
+        <a href="/" class="text-accent-700 hover:text-accent-800 font-semibold">
+          Volver al inicio
+        </a>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>

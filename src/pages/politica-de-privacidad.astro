@@ -1,0 +1,119 @@
+---
+// TODO: este texto es una base genérica para destrabar el desarrollo.
+// Antes de publicar el sitio, un asesor legal del estudio tiene que revisar
+// y ajustar el contenido de esta página.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/ui/Section.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+import { site } from '../data/site';
+---
+
+<BaseLayout
+  title={`Política de privacidad — ${site.nombre}`}
+  description={`Cómo ${site.nombre} recopila, usa y protege tu información.`}
+>
+  <Section background="white">
+    <SectionHeading
+      as="h1"
+      eyebrow="Legal"
+      title="Política de privacidad"
+      subtitle="Cómo recopilamos, usamos y protegemos tu información cuando visitás este sitio o nos contactás."
+    />
+
+    <div class="mt-14 max-w-3xl space-y-10">
+      <p class="text-muted text-sm">Última actualización: a definir.</p>
+
+      <div class="space-y-3">
+        <h2 class="text-2xl">Qué información recopilamos</h2>
+        <p>
+          Cuando nos escribís a través del formulario de contacto, por teléfono
+          o por WhatsApp, podemos recibir datos como tu nombre, tu número de
+          teléfono y el contenido de tu consulta. No pedimos información
+          sensible ni datos que no necesitemos para responderte.
+        </p>
+      </div>
+
+      <div class="space-y-3">
+        <h2 class="text-2xl">Para qué la usamos</h2>
+        <p>
+          Usamos esa información únicamente para responder tu consulta,
+          coordinar reuniones y, si nos autorizás, mantenerte al tanto de
+          novedades del estudio. No la usamos con fines distintos a los que
+          motivaron tu contacto.
+        </p>
+      </div>
+
+      <div class="space-y-3">
+        <h2 class="text-2xl">Con quién la compartimos</h2>
+        <p>
+          No vendemos ni cedemos tus datos a terceros. Sólo la compartimos con
+          proveedores que nos ayudan a operar el sitio (por ejemplo, hosting o
+          herramientas de mensajería), y únicamente en la medida necesaria para
+          prestar el servicio.
+        </p>
+      </div>
+
+      <div class="space-y-3">
+        <h2 class="text-2xl">Cómo la protegemos</h2>
+        <p>
+          Tomamos recaudos razonables para proteger tu información de accesos no
+          autorizados, pérdida o uso indebido, tanto a nivel técnico como
+          organizativo.
+        </p>
+      </div>
+
+      <div class="space-y-3">
+        <h2 class="text-2xl">Tus derechos</h2>
+        <p>
+          De acuerdo con la Ley 25.326 de Protección de Datos Personales, tenés
+          derecho a acceder, rectificar y solicitar la supresión de tus datos
+          personales. La Agencia de Acceso a la Información Pública, en su
+          carácter de Órgano de Control de la Ley 25.326, tiene la atribución de
+          atender las denuncias y reclamos que se interpongan con relación al
+          incumplimiento de las normas sobre protección de datos personales.
+        </p>
+      </div>
+
+      <div class="space-y-3">
+        <h2 class="text-2xl">Cookies</h2>
+        <p>
+          Este sitio puede usar cookies técnicas indispensables para su
+          funcionamiento y, eventualmente, herramientas de analítica para
+          entender cómo se usa. Cuando eso esté activo, lo vamos a detallar acá
+          con el detalle de cada cookie y su finalidad.
+        </p>
+      </div>
+
+      <div class="space-y-3">
+        <h2 class="text-2xl">Contacto</h2>
+        <p>
+          Si tenés preguntas sobre esta política o querés ejercer alguno de tus
+          derechos, escribinos por WhatsApp al
+          <a
+            href={site.whatsappHref}
+            target="_blank"
+            rel="noopener"
+            class="text-accent-700 underline underline-offset-2"
+          >
+            {site.whatsapp}
+          </a>
+          o llamanos al
+          <a
+            href={site.telefonoHref}
+            class="text-accent-700 underline underline-offset-2"
+          >
+            {site.telefono}
+          </a>.
+        </p>
+      </div>
+
+      <div class="space-y-3">
+        <h2 class="text-2xl">Cambios a esta política</h2>
+        <p>
+          Podemos actualizar esta página de tanto en tanto. Si hacemos cambios
+          importantes, lo vamos a comunicar de forma visible en el sitio.
+        </p>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>

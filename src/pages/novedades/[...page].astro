@@ -1,0 +1,21 @@
+---
+import { getCollection } from 'astro:content';
+import type { GetStaticPathsOptions, Page } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import NovedadesListado from '../../components/sections/NovedadesListado.astro';
+import { ordenarPorFecha, type Novedad } from '../../lib/novedades';
+
+export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
+  const todas = await getCollection('novedades');
+  return paginate(ordenarPorFecha(todas), { pageSize: 9 });
+}
+
+const { page } = Astro.props as { page: Page<Novedad> };
+---
+
+<BaseLayout
+  title="Novedades — Asensio Martínez"
+  description="Los cambios en normativa impositiva, laboral y societaria que te afectan, explicados en castellano."
+>
+  <NovedadesListado page={page} categoriaActiva={null} />
+</BaseLayout>

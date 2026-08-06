@@ -1,0 +1,35 @@
+---
+import { getCollection } from 'astro:content';
+import Section from '../ui/Section.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import Button from '../ui/Button.astro';
+import NovedadCard from '../NovedadCard.astro';
+import { ordenarPorFecha } from '../../lib/novedades';
+
+const todas = await getCollection('novedades');
+const ultimas = ordenarPorFecha(todas).slice(0, 3);
+---
+
+<Section id="novedades" background="white" class="scroll-mt-32">
+  <SectionHeading
+    eyebrow="Novedades"
+    title="Lo último en normativa"
+    subtitle="Publicamos los cambios que te afectan, explicados en castellano."
+  />
+
+  <ul class="mt-14 grid grid-cols-1 gap-8 lg:grid-cols-3">
+    {
+      ultimas.map((novedad, i) => (
+        <li data-reveal style={`--reveal-delay: ${i * 80}ms`}>
+          <NovedadCard novedad={novedad} />
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="mt-12 flex justify-center">
+    <Button href="/novedades" variant="secondary">
+      Ver todas las novedades
+    </Button>
+  </div>
+</Section>

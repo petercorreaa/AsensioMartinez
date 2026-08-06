@@ -1,0 +1,125 @@
+---
+import { Icon } from 'astro-icon/components';
+import Section from '../ui/Section.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import Card from '../ui/Card.astro';
+import { whatsappLink } from '../../data/site';
+
+const necesidades = [
+  {
+    icon: 'lucide:rocket',
+    kicker: 'Estoy arrancando',
+    titulo: 'Quiero constituir mi sociedad y arrancar bien',
+    cuerpo:
+      'Te ayudamos a elegir la figura que mejor le sirve a tu proyecto — S.A.S., S.R.L. o S.A. — y nos ocupamos de todo el proceso: estatuto, inscripción, CUIT, altas impositivas y libros. Arrancás con la estructura correcta desde el día uno.',
+    items: [
+      'Elección de la figura societaria',
+      'Constitución e inscripción',
+      'Alta en ARCA y ARBA',
+      'Libros societarios y rubricados',
+    ],
+    mensaje: 'Hola, quisiera consultar sobre la constitución de una sociedad',
+  },
+  {
+    icon: 'lucide:file-check',
+    kicker: 'Necesito ordenarme',
+    titulo: 'Quiero regularizar y controlar mi situación impositiva',
+    cuerpo:
+      'Revisamos tu situación ante ARCA y ARBA, detectamos lo que está pendiente y armamos un plan para regularizarlo. Después tomamos la gestión mensual, así dejás de correr atrás de los vencimientos.',
+    items: [
+      'Diagnóstico impositivo integral',
+      'Regularización y planes de pago',
+      'Liquidaciones mensuales',
+      'Recupero de saldos a favor',
+    ],
+    mensaje: 'Hola, quisiera consultar sobre mi situación impositiva',
+  },
+  {
+    icon: 'lucide:folder-check',
+    kicker: 'Necesito los papeles al día',
+    titulo: 'Quiero tener la documentación lista cuando la necesito',
+    cuerpo:
+      'Balances, estados contables, carpetas para bancos y licitaciones, libros societarios. Todo preparado y disponible cuando te lo piden, no dos semanas después.',
+    items: [
+      'Balances y estados contables',
+      'Carpetas bancarias y para licitaciones',
+      'Libros societarios y actas',
+      'Liquidación de sueldos',
+    ],
+    mensaje: 'Hola, quisiera consultar sobre balances y documentación contable',
+  },
+];
+---
+
+{
+  /*
+  El header sticky mide 112px + 1px de borde. scroll-mt-32 (128px) deja el
+  arranque de la sección apenas debajo del header cuando se navega a #servicios,
+  en vez de quedar tapado por ese píxel de más.
+*/
+}
+<Section id="servicios" background="tint" class="scroll-mt-32">
+  <SectionHeading
+    eyebrow="En qué te podemos ayudar"
+    title="¿En qué momento estás?"
+    subtitle="La mayoría de nuestros clientes llega con una de estas tres situaciones. Elegí la que más se parece a la tuya."
+  />
+
+  <ul class="mt-14 grid grid-cols-1 gap-6 lg:grid-cols-3">
+    {
+      necesidades.map((n, i) => (
+        <li class="flex" data-reveal style={`--reveal-delay: ${i * 80}ms`}>
+          {/*
+            Card ya trae hover:-translate-y-0.5 (2px). Acá el diseño pide 4px,
+            así que se pisa con el sufijo `!`: si no, gana la clase que Tailwind
+            haya emitido más abajo en la hoja, no la que va última en el atributo.
+          */}
+          <Card padding="lg" class="flex h-full flex-col hover:-translate-y-1!">
+            <span class="bg-brand-50 flex size-12 shrink-0 items-center justify-center transition-transform duration-200 group-hover:scale-105">
+              <Icon
+                name={n.icon}
+                class="text-brand-600 size-6"
+                aria-hidden="true"
+              />
+            </span>
+
+            <p class="text-accent-700 mt-6 text-[13px] font-semibold tracking-[0.12em] uppercase">
+              {n.kicker}
+            </p>
+
+            <h3 class="mt-2 text-2xl">{n.titulo}</h3>
+
+            <p class="text-muted mt-4 text-base leading-relaxed">{n.cuerpo}</p>
+
+            <ul class="mt-6 flex flex-col gap-2.5">
+              {n.items.map((item) => (
+                <li class="flex items-start gap-2.5 text-sm">
+                  <Icon
+                    name="lucide:check"
+                    class="text-accent-700 mt-1 size-4 shrink-0"
+                    aria-hidden="true"
+                  />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+
+            <a
+              href={whatsappLink(n.mensaje)}
+              target="_blank"
+              rel="noopener"
+              class="text-accent-700 hover:text-accent-800 mt-auto inline-flex items-center gap-2 pt-8 text-[15px] font-semibold"
+            >
+              Hablemos de esto
+              <Icon
+                name="lucide:arrow-right"
+                class="size-4 shrink-0 transition-transform duration-200 group-hover:translate-x-1"
+                aria-hidden="true"
+              />
+            </a>
+          </Card>
+        </li>
+      ))
+    }
+  </ul>
+</Section>

@@ -1,0 +1,85 @@
+---
+import { Image } from 'astro:assets';
+import { Icon } from 'astro-icon/components';
+import Card from './ui/Card.astro';
+import Placeholder from './ui/Placeholder.astro';
+import { formatFecha, type Novedad } from '../lib/novedades';
+
+interface Props {
+  novedad: Novedad;
+}
+
+const { novedad } = Astro.props;
+const { titulo, resumen, fecha, categoria, imagen } = novedad.data;
+const href = `/novedades/${novedad.id}`;
+---
+
+{
+  /*
+    "Toda la card clickeable, pero el link real envuelve el título" — el
+    truco del link estirado: el <a> real sólo abraza el título, y su
+    ::after (position:absolute; inset:0, ver <style>) se extiende sobre toda
+    la Card. Así hay un solo link real por card (bueno para lectores de
+    pantalla) pero toda la superficie responde al click/hover. Requiere que
+    la Card sea el contenedor posicionado (relative) de ese ::after.
+  */
+}
+<Card padding="none" class="relative flex h-full flex-col overflow-hidden">
+  {
+    imagen ? (
+      <Image
+        src={imagen}
+        alt={`Imagen de la nota: ${titulo}`}
+        width={640}
+        height={360}
+        format="webp"
+        loading="lazy"
+        class="aspect-video w-full object-cover"
+      />
+    ) : (
+      <Placeholder label={`Imagen: ${titulo}`} ratio="16/9" />
+    )
+  }
+
+  <div class="flex flex-1 flex-col p-6">
+    <div class="flex items-center gap-3">
+      <span
+        class="bg-accent-50 text-accent-700 px-3 py-1 text-xs font-semibold tracking-wide uppercase"
+      >
+        {categoria}
+      </span>
+      <time datetime={fecha.toISOString()} class="text-muted text-[13px]">
+        {formatFecha(fecha)}
+      </time>
+    </div>
+
+    <h3 class="font-display mt-3 line-clamp-2 text-xl">
+      <a href={href} class="stretched-link hover:text-accent-700">
+        {titulo}
+      </a>
+    </h3>
+
+    <p class="text-muted mt-2 line-clamp-3 text-[15px] leading-relaxed">
+      {resumen}
+    </p>
+
+    <span
+      class="text-accent-700 mt-auto inline-flex items-center gap-2 pt-5 text-sm font-semibold"
+    >
+      Leer nota
+      <Icon
+        name="lucide:arrow-right"
+        class="size-4 shrink-0 transition-transform duration-200 group-hover:translate-x-1"
+        aria-hidden="true"
+      />
+    </span>
+  </div>
+</Card>
+
+<style>
+  .stretched-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+</style>

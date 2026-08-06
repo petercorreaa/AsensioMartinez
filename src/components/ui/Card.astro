@@ -1,0 +1,42 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+  /** Si se pasa, toda la card se vuelve un enlace */
+  href?: string;
+  /** Padding interno */
+  padding?: 'none' | 'md' | 'lg';
+  class?: string;
+}
+
+const { href, padding = 'md', class: className, ...rest } = Astro.props;
+
+const paddings = {
+  none: '',
+  md: 'p-6',
+  lg: 'p-8',
+};
+
+const classes = [
+  'group block border border-line bg-white shadow-soft',
+  'transition-[border-color,transform,box-shadow] duration-200 ease-out',
+  'hover:-translate-y-0.5 hover:border-accent-700',
+  href && 'no-underline text-inherit',
+  paddings[padding],
+  className,
+]
+  .filter(Boolean)
+  .join(' ');
+---
+
+{
+  href ? (
+    <a href={href} class={classes} {...(rest as HTMLAttributes<'a'>)}>
+      <slot />
+    </a>
+  ) : (
+    <div class={classes} {...rest}>
+      <slot />
+    </div>
+  )
+}

@@ -1,0 +1,324 @@
+---
+import { Image } from 'astro:assets';
+import { Icon } from 'astro-icon/components';
+import Button from './ui/Button.astro';
+import logo from '../assets/brand/logo.png';
+import { site } from '../data/site';
+---
+
+<div
+  id="header-sentinel"
+  class="absolute top-0 left-0 h-5 w-px"
+  aria-hidden="true"
+>
+</div>
+
+<header
+  id="site-header"
+  class="sticky top-0 z-50 border-b border-transparent bg-white transition-[border-color,box-shadow] duration-200"
+>
+  <div class="container-xl flex h-28 items-center justify-between gap-6">
+    <a
+      href="/"
+      class="block shrink-0"
+      aria-label={`${site.nombre} — Ir al inicio`}
+    >
+      {
+        /*
+        alt="": el <a> que envuelve el logo ya lleva aria-label con el
+        nombre completo del estudio — que la imagen también anuncie el
+        mismo texto sería redundante para un lector de pantalla.
+      */
+      }
+      {
+        /*
+        densities: el h-20 de la clase deja el logo en 80px CSS de alto,
+        pero en cualquier pantalla retina (2x/3x) el navegador necesita más
+        píxeles reales que esos para verse nítido — si el archivo sólo mide
+        80px de alto, retina lo estira y se pixela. densities le pide a
+        Astro que genere también las versiones 2x/3x y arma el srcset solo;
+        el navegador elige la que corresponda según la pantalla.
+      */
+      }
+      <Image
+        src={logo}
+        alt=""
+        height={80}
+        densities={[1, 2, 3]}
+        loading="eager"
+        fetchpriority="high"
+        class="h-20 w-auto"
+      />
+    </a>
+
+    <nav
+      class="hidden items-center gap-8 lg:flex"
+      aria-label="Navegación principal"
+    >
+      {
+        site.nav.map((item) => (
+          <a href={item.href} class="nav-link">
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="hidden items-center gap-6 lg:flex">
+      <a
+        href={site.telefonoHref}
+        class="text-ink hover:text-accent-700 hidden items-center gap-2 text-[15px] font-medium transition-colors duration-200 xl:inline-flex"
+      >
+        <Icon
+          name="lucide:phone"
+          class="text-brand-600 size-4"
+          aria-hidden="true"
+        />
+        {site.telefono}
+      </a>
+      <Button href="/#contacto" variant="primary">Agendá una consulta</Button>
+    </div>
+
+    <button
+      id="menu-toggle"
+      type="button"
+      class="text-navy-900 inline-flex items-center justify-center p-2.5 lg:hidden"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+      aria-label="Abrir menú"
+    >
+      <Icon
+        id="menu-icon-open"
+        name="lucide:menu"
+        class="size-6"
+        aria-hidden="true"
+      />
+      <Icon
+        id="menu-icon-close"
+        name="lucide:x"
+        class="hidden size-6"
+        aria-hidden="true"
+      />
+    </button>
+  </div>
+</header>
+
+<div
+  id="mobile-menu-backdrop"
+  class="bg-navy-900/40 fixed inset-0 z-50 hidden opacity-0 transition-opacity duration-200 lg:hidden"
+>
+</div>
+
+<div
+  id="mobile-menu"
+  class="shadow-soft fixed inset-y-0 right-0 z-50 flex w-[85%] translate-x-full flex-col overflow-y-auto bg-white p-6 transition-transform duration-200 ease-out sm:max-w-md lg:hidden"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Menú de navegación"
+  tabindex="-1"
+>
+  <div class="flex items-center justify-between">
+    <span class="font-display text-navy-900 text-lg font-bold"
+      >{site.nombre}</span
+    >
+    <button
+      type="button"
+      data-menu-close
+      class="text-navy-900 p-2.5"
+      aria-label="Cerrar menú"
+    >
+      <Icon name="lucide:x" class="size-6" aria-hidden="true" />
+    </button>
+  </div>
+
+  <nav
+    class="mt-10 flex flex-col gap-6"
+    aria-label="Navegación principal (móvil)"
+  >
+    {
+      site.nav.map((item) => (
+        <a
+          href={item.href}
+          data-menu-link
+          class="font-display text-navy-900 text-2xl font-semibold uppercase"
+        >
+          {item.label}
+        </a>
+      ))
+    }
+  </nav>
+
+  <div class="mt-auto flex flex-col gap-3 pt-10">
+    <Button
+      href={site.whatsappHref}
+      target="_blank"
+      rel="noopener"
+      data-menu-link
+      variant="secondary"
+      size="lg"
+      class="w-full"
+    >
+      Escribinos por WhatsApp
+    </Button>
+    <Button
+      href="/#contacto"
+      data-menu-link
+      variant="primary"
+      size="lg"
+      class="w-full"
+    >
+      Agendá una consulta
+    </Button>
+  </div>
+</div>
+
+<style>
+  .nav-link {
+    position: relative;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    height: 2px;
+    width: 100%;
+    background-color: var(--color-brand-600);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 200ms ease;
+  }
+
+  .nav-link:hover,
+  .nav-link:focus-visible {
+    color: var(--color-accent-700);
+  }
+
+  .nav-link:hover::after,
+  .nav-link:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  :global(html.mobile-menu-open) {
+    overflow: hidden;
+  }
+</style>
+
+<script>
+  const header = document.getElementById('site-header');
+  const sentinel = document.getElementById('header-sentinel');
+
+  if (header && sentinel && 'IntersectionObserver' in window) {
+    const scrollObserver = new IntersectionObserver(
+      ([entry]) => {
+        const scrolled = !entry.isIntersecting;
+        header.classList.toggle('border-line', scrolled);
+        header.classList.toggle('border-transparent', !scrolled);
+        header.classList.toggle('shadow-soft', scrolled);
+      },
+      { threshold: 0 },
+    );
+    scrollObserver.observe(sentinel);
+  }
+
+  const toggle = document.getElementById('menu-toggle');
+  const panel = document.getElementById('mobile-menu');
+  const backdrop = document.getElementById('mobile-menu-backdrop');
+  const iconOpen = document.getElementById('menu-icon-open');
+  const iconClose = document.getElementById('menu-icon-close');
+
+  if (toggle && panel && backdrop) {
+    let closeTimeout: number | undefined;
+
+    // El foco NO queda atrapado solo: aria-modal="true" en el panel no
+    // alcanza, es sólo una pista para lectores de pantalla — el navegador
+    // igual deja tabular hacia elementos detrás del backdrop (los tapa
+    // visualmente, pero siguen en el orden de tabulación del DOM). Por eso
+    // hace falta interceptar Tab/Shift+Tab a mano mientras el panel está
+    // abierto.
+    const seleccionFocables =
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+    const atraparFoco = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') return;
+
+      const focables = Array.from(
+        panel.querySelectorAll<HTMLElement>(seleccionFocables),
+      ).filter((el) => el.offsetParent !== null);
+      if (focables.length === 0) return;
+
+      const primero = focables[0];
+      const ultimo = focables[focables.length - 1];
+
+      if (event.shiftKey && document.activeElement === primero) {
+        event.preventDefault();
+        ultimo.focus();
+      } else if (!event.shiftKey && document.activeElement === ultimo) {
+        event.preventDefault();
+        primero.focus();
+      }
+    };
+
+    const openMenu = () => {
+      window.clearTimeout(closeTimeout);
+      backdrop.classList.remove('hidden');
+      requestAnimationFrame(() => {
+        panel.classList.remove('translate-x-full');
+        backdrop.classList.remove('opacity-0');
+      });
+      toggle.setAttribute('aria-expanded', 'true');
+      iconOpen?.classList.add('hidden');
+      iconClose?.classList.remove('hidden');
+      document.documentElement.classList.add('mobile-menu-open');
+      panel.focus();
+      panel.addEventListener('keydown', atraparFoco);
+    };
+
+    const closeMenu = () => {
+      panel.classList.add('translate-x-full');
+      backdrop.classList.add('opacity-0');
+      toggle.setAttribute('aria-expanded', 'false');
+      iconOpen?.classList.remove('hidden');
+      iconClose?.classList.add('hidden');
+      document.documentElement.classList.remove('mobile-menu-open');
+      closeTimeout = window.setTimeout(
+        () => backdrop.classList.add('hidden'),
+        200,
+      );
+      panel.removeEventListener('keydown', atraparFoco);
+      toggle.focus();
+    };
+
+    toggle.addEventListener('click', () => {
+      const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+      if (isOpen) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    });
+
+    backdrop.addEventListener('click', closeMenu);
+
+    panel
+      .querySelectorAll('[data-menu-close], [data-menu-link]')
+      .forEach((el) => {
+        el.addEventListener('click', closeMenu);
+      });
+
+    document.addEventListener('keydown', (event) => {
+      if (
+        event.key === 'Escape' &&
+        toggle.getAttribute('aria-expanded') === 'true'
+      ) {
+        closeMenu();
+      }
+    });
+  }
+</script>

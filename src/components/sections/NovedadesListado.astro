@@ -1,0 +1,145 @@
+---
+import type { Page } from 'astro';
+import { Icon } from 'astro-icon/components';
+import Section from '../ui/Section.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import NovedadCard from '../NovedadCard.astro';
+import {
+  CATEGORIAS,
+  slugCategoria,
+  type Categoria,
+  type Novedad,
+} from '../../lib/novedades';
+
+interface Props {
+  page: Page<Novedad>;
+  categoriaActiva: Categoria | null;
+}
+
+const { page, categoriaActiva } = Astro.props;
+
+const titulo = categoriaActiva
+  ? `Novedades de ${categoriaActiva}`
+  : 'Todas las novedades';
+
+const bajada = categoriaActiva
+  ? `Los cambios normativos en materia ${categoriaActiva.toLowerCase()} que publicamos hasta ahora.`
+  : 'Los cambios normativos que te afectan, explicados en castellano. Filtrá por tema o recorré todo lo que publicamos.';
+---
+
+<Section background="tint" class="pb-14 md:pb-16">
+  <SectionHeading
+    as="h1"
+    eyebrow="Novedades"
+    title={titulo}
+    subtitle={bajada}
+  />
+</Section>
+
+<Section background="white" class="pt-14 md:pt-16">
+  {
+    /*
+    h2 visualmente oculto (sr-only): el <h1> de arriba es el título de la
+    página entera, y las cards de acá abajo usan <h3> (NovedadCard, el mismo
+    componente que en la home SÍ cuelga de un <h2> visible). Sin este h2
+    puente, el esquema de headings saltaría de h1 a h3 directo.
+  */
+  }
+  <h2 class="sr-only">Listado de novedades</h2>
+
+  {
+    /*
+    Pills sin JS: cada una es un link real a una ruta estática distinta
+    (/novedades o /novedades/categoria/{slug}), no un botón con handler.
+    Funciona igual con JS desactivado porque son navegaciones normales.
+  */
+  }
+  <nav aria-label="Filtrar por categoría" class="flex flex-wrap gap-3">
+    <a
+      href="/novedades"
+      aria-current={categoriaActiva === null ? 'page' : undefined}
+      class:list={[
+        'border px-4 py-2 text-sm font-semibold transition-colors duration-200',
+        categoriaActiva === null
+          ? 'bg-brand-700 border-brand-700 text-white'
+          : 'border-line text-ink hover:border-brand-600 bg-white',
+      ]}
+    >
+      Todas
+    </a>
+    {
+      CATEGORIAS.map((categoria) => (
+        <a
+          href={`/novedades/categoria/${slugCategoria(categoria)}`}
+          aria-current={categoriaActiva === categoria ? 'page' : undefined}
+          class:list={[
+            'border px-4 py-2 text-sm font-semibold transition-colors duration-200',
+            categoriaActiva === categoria
+              ? 'bg-brand-700 border-brand-700 text-white'
+              : 'border-line text-ink hover:border-brand-600 bg-white',
+          ]}
+        >
+          {categoria}
+        </a>
+      ))
+    }
+  </nav>
+
+  {
+    page.data.length > 0 ? (
+      <ul class="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-3">
+        {page.data.map((novedad, i) => (
+          <li data-reveal style={`--reveal-delay: ${i * 80}ms`}>
+            <NovedadCard novedad={novedad} />
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="text-muted mt-10">
+        Todavía no publicamos novedades en esta categoría.
+      </p>
+    )
+  }
+
+  {
+    page.lastPage > 1 && (
+      <div class="border-line mt-14 flex items-center justify-between border-t pt-8">
+        {page.url.prev ? (
+          <a
+            href={page.url.prev}
+            class="text-ink hover:text-accent-700 group inline-flex items-center gap-2 text-sm font-semibold"
+          >
+            <Icon
+              name="lucide:arrow-left"
+              class="size-4 transition-transform duration-200 group-hover:-translate-x-1"
+              aria-hidden="true"
+            />
+            Anterior
+          </a>
+        ) : (
+          <span />
+        )}
+
+        <p class="text-muted text-sm">
+          Página {page.currentPage} de {page.lastPage}
+        </p>
+
+        {page.url.next ? (
+          <a
+            href={page.url.next}
+            class="text-ink hover:text-accent-700 group inline-flex items-center gap-2 text-sm font-semibold"
+          >
+            Siguiente
+            <Icon
+              name="lucide:arrow-right"
+              class="size-4 transition-transform duration-200 group-hover:translate-x-1"
+              aria-hidden="true"
+            />
+          </a>
+        ) : (
+          <span />
+        )}
+      </div>
+    )
+  }
+</Section>

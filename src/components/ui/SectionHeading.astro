@@ -1,0 +1,82 @@
+---
+interface Props {
+  eyebrow?: string;
+  title: string;
+  subtitle?: string;
+  /**
+   * 'light' = sobre fondo blanco o tint (por defecto).
+   * 'dark'  = sobre fondo navy: accent-700 no contrasta ahí (el eyebrow pasa a
+   *           brand-600, que sobre navy-900 da ~5.45:1 — se mantiene teal en
+   *           las secciones oscuras, no pasa a azul) y el subtítulo a
+   *           blanco/70.
+   */
+  tone?: 'light' | 'dark';
+  /** Alineación del bloque */
+  align?: 'left' | 'center';
+  /**
+   * Nivel del heading. 'h2' por defecto: así se usa en cada sección de la
+   * home, donde el <h1> ya lo puso el Hero. Las páginas que NO tienen otro
+   * <h1> propio (política de privacidad, listado de novedades) tienen que
+   * pasar as="h1" acá — si no, la página queda sin ningún <h1>.
+   */
+  as?: 'h1' | 'h2';
+  class?: string;
+}
+
+const {
+  eyebrow,
+  title,
+  subtitle,
+  tone = 'light',
+  align = 'left',
+  as: Heading = 'h2',
+  class: className,
+} = Astro.props;
+
+const isDark = tone === 'dark';
+const isCenter = align === 'center';
+
+const wrapper = ['max-w-3xl', isCenter && 'mx-auto text-center', className]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<div class={wrapper}>
+  {
+    eyebrow && (
+      <p
+        class:list={[
+          'flex items-center gap-3 text-[13px] font-semibold tracking-[0.12em] uppercase',
+          isCenter && 'justify-center',
+          isDark ? 'text-brand-600' : 'text-accent-700',
+        ]}
+      >
+        <span
+          class:list={[
+            'h-px w-8 shrink-0',
+            isDark ? 'bg-brand-600' : 'bg-accent-700',
+          ]}
+          aria-hidden="true"
+        />
+        {eyebrow}
+      </p>
+    )
+  }
+
+  <Heading
+    class:list={[
+      'mt-4 text-[clamp(1.875rem,1.2rem+2.2vw,2.75rem)]',
+      isDark && 'text-white',
+    ]}
+  >
+    {title}
+  </Heading>
+
+  {
+    subtitle && (
+      <p class:list={['mt-4 text-lg', isDark ? 'text-white/70' : 'text-muted']}>
+        {subtitle}
+      </p>
+    )
+  }
+</div>
