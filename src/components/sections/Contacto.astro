@@ -31,7 +31,7 @@ const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURICom
     {/* ---------------- Columna izquierda: datos ---------------- */}
     <div>
       <Card padding="lg" class="flex h-full flex-col">
-        <ul class="flex flex-col gap-5">
+        <ul class="mb-10 flex flex-col gap-5">
           <li class="flex items-start gap-3">
             <Icon
               name="lucide:map-pin"
@@ -97,6 +97,19 @@ const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURICom
           </li>
         </ul>
 
+        {
+          /*
+          El aire mínimo va como mb-10 de la <ul>, no como padding del botón:
+          Button ya trae su propio py-4, y sumarle un pt-* lo dejaría con el
+          padding descompensado en vez de separarlo de la lista.
+
+          El mt-auto del botón sigue igual, para que quede pegado al fondo de
+          la card cuando el grid la estira a la altura del mapa. Los dos se
+          suman: cuando sobra alto manda el auto, y cuando la card viene justa
+          —que es cuando antes quedaban casi pegados— el mb-10 garantiza la
+          separación igual.
+        */
+        }
         <Button
           href={site.whatsappHref}
           target="_blank"
