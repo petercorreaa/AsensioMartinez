@@ -9,19 +9,29 @@ export interface SiteData {
   nombre: string;
   tagline: string;
   direccion: string;
+  /**
+   * La misma dirección, en el formato que entiende el geocoder de Google.
+   * Va sin el "e/ 2 y 3": la referencia "entre calles" es una convención
+   * local que Maps no interpreta y que sólo agrega ruido a la búsqueda,
+   * con riesgo de que el pin caiga en otra cuadra. Se usa SÓLO para armar
+   * las URLs del mapa; lo que se muestra en pantalla es `direccion`.
+   */
+  direccionMaps: string;
   ciudad: string;
   provincia: string;
   pais: string;
-  /** Teléfono en formato legible para mostrar */
-  telefono: string;
-  /** Mismo teléfono en formato tel: para el atributo href */
-  telefonoHref: string;
-  /** WhatsApp en formato legible para mostrar */
+  /**
+   * WhatsApp en formato legible para mostrar. Es el único teléfono del
+   * estudio: la línea fija (0221) 483-4670 se dio de baja.
+   */
   whatsapp: string;
   /** Link wa.me con mensaje pre-cargado */
   whatsappHref: string;
-  /** TODO: el sitio actual no publica email. Completar cuando el estudio lo confirme. */
-  email: string;
+  /** Casillas de los socios, usadas en Contacto y en las cards del estudio */
+  emails: {
+    esteban: string;
+    matias: string;
+  };
   /** Instagram del estudio */
   instagramHref: string;
   /** LinkedIn del estudio (página de empresa, no perfiles personales) */
@@ -53,17 +63,17 @@ export function whatsappLink(mensaje: string): string {
 export const site: SiteData = {
   nombre: 'Asensio Martínez',
   tagline: 'Estudio contable en La Plata',
-  direccion: 'Diagonal 76 nro. 482',
+  direccion: 'Diagonal 74 nro. 752 e/ 2 y 3',
+  direccionMaps: 'Diagonal 74 752, La Plata, Buenos Aires, Argentina',
   ciudad: 'La Plata',
   provincia: 'Buenos Aires',
   pais: 'Argentina',
-  telefono: '(0221) 483-4670',
-  telefonoHref: 'tel:+542214834670',
-  whatsapp: '(0221) 563-7666',
+  whatsapp: '+54 221 563-7666',
   whatsappHref: whatsappLink('Hola, quisiera hacer una consulta'),
-  // TODO: el sitio actual no publica una dirección de email.
-  // Cuando el estudio la confirme, completarla acá y los componentes la muestran solos.
-  email: '',
+  emails: {
+    esteban: 'esteban@asensiomartinez.com.ar',
+    matias: 'matias@asensiomartinez.com.ar',
+  },
   instagramHref: 'https://www.instagram.com/asensiomartinezestudio/',
   linkedinHref: 'https://www.linkedin.com/company/asensio-martinez-estudio/',
   horario: 'Lunes a viernes, 9 a 18 h',

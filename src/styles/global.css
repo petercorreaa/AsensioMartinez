@@ -262,6 +262,66 @@
 }
 
 /* ==========================================================================
+   Splash de carga — pantalla blanca con el símbolo de la marca al centro.
+
+   Oculto por defecto y mostrado sólo dentro de `scripting: enabled`, no al
+   revés. Es la única forma segura: si el navegador no entiende la media
+   query (o el usuario tiene JS desactivado), la regla no matchea, el splash
+   NO se muestra y la página se ve normal. Al revés —visible por defecto y
+   escondido con JS— cualquiera de esos dos casos dejaría la página tapada
+   por una pantalla blanca para siempre.
+   ========================================================================== */
+
+#splash {
+  display: none;
+}
+
+@media (scripting: enabled) {
+  #splash {
+    position: fixed;
+    inset: 0;
+    /* Por encima de todo: header y menú móvil son z-50, el FAB z-40,
+       el skip-link z-100. */
+    z-index: 200;
+    display: grid;
+    place-items: center;
+    background-color: #ffffff;
+    /*
+      Red de seguridad: si el evento `load` nunca llega (un script que
+      revienta, un recurso colgado), el splash se va solo igual en vez de
+      dejar el sitio tapado. Es un plan B, no el mecanismo normal: lo
+      habitual es que `.cargado` lo esconda mucho antes.
+    */
+    animation: splash-failsafe 300ms ease 4s forwards;
+  }
+
+  /* Ya se vio en esta sesión: no se muestra más (ver el script del <head>). */
+  html.sin-splash #splash {
+    display: none;
+  }
+
+  /*
+    visibility además de opacity, y con delay igual a la duración del fade:
+    sin eso el div queda invisible pero sigue capturando clicks encima de
+    toda la página.
+  */
+  html.cargado #splash {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 300ms ease,
+      visibility 0s linear 300ms;
+  }
+}
+
+@keyframes splash-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* ==========================================================================
    Movimiento reducido
    ========================================================================== */
 

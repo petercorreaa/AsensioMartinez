@@ -103,53 +103,49 @@ reordenar nada a mano.
 
 ## Dónde se cambian los datos de contacto
 
-Todos los datos de contacto del estudio (dirección, teléfono, WhatsApp,
-horario) están en un solo lugar: **`src/data/site.ts`**. Nunca están escritos
-a mano en los componentes — así que para cambiar el teléfono, por ejemplo,
-alcanza con editar ese archivo una vez y se actualiza en todo el sitio
-(header, footer, formulario de contacto, JSON-LD para Google, etc.).
+Todos los datos de contacto del estudio (dirección, WhatsApp, mails, horario)
+están en un solo lugar: **`src/data/site.ts`**. Nunca están escritos a mano en
+los componentes — así que para cambiar un dato alcanza con editar ese archivo
+una vez y se actualiza en todo el sitio (header, footer, sección de contacto,
+mapa, política de privacidad, JSON-LD para Google, etc.).
 
 Campos principales:
 
 ```ts
-telefono: '(0221) 483-4670',           // como se muestra en pantalla
-telefonoHref: 'tel:+542214834670',     // el mismo número, formato para el link tel:
-whatsapp: '(0221) 563-7666',
+direccion: 'Diagonal 74 nro. 752 e/ 2 y 3',              // como se muestra en pantalla
+direccionMaps: 'Diagonal 74 752, La Plata, Buenos Aires, Argentina', // sólo para las URLs del mapa
+whatsapp: '+54 221 563-7666',                            // único teléfono del estudio
+emails: {
+  esteban: 'esteban@asensiomartinez.com.ar',
+  matias: 'matias@asensiomartinez.com.ar',
+},
 horario: 'Lunes a viernes, 9 a 18 h',
-email: '',                              // vacío a propósito: ver el TODO al lado en el archivo
 ```
 
-Si cambia el teléfono o el WhatsApp, hay que actualizar **los dos** campos
-relacionados (el de texto y el de `Href`), manteniendo el mismo número.
+Dos cosas para tener en cuenta:
 
-## Cómo configurar la access key de Web3Forms
+- **El estudio no tiene línea fija.** La vieja (0221) 483-4670 se dio de baja y
+  no quedó ningún campo `telefono` en `site.ts`: el único número es el de
+  WhatsApp.
+- **`direccion` y `direccionMaps` son la misma dirección en dos formatos.** La
+  primera es la que se muestra, con el "e/ 2 y 3"; la segunda es la que se le
+  pasa a Google Maps, sin esa referencia, porque el geocoder no la interpreta y
+  puede terminar poniendo el pin en otra cuadra. Si cambia la dirección hay que
+  actualizar **las dos**.
+- El número de WhatsApp aparece además como `whatsappNumero` (formato
+  internacional sin signos) arriba del archivo, que es el que arma los links de
+  `wa.me`. Si cambia el WhatsApp, actualizar los dos.
 
-El formulario de contacto (sección "Contanos tu caso" de la home) envía los
-mensajes usando [Web3Forms](https://web3forms.com), un servicio gratuito que
-no necesita backend propio.
+## Canales de contacto
 
-1. Entrá a [web3forms.com](https://web3forms.com) y creá una access key
-   gratis con el email donde el estudio quiere recibir las consultas (no hace
-   falta crear una cuenta, es un formulario simple).
-2. Web3Forms te da una key (un código largo tipo `a1b2c3d4-...`).
-3. Abrí `src/components/sections/Contacto.astro` y buscá esta línea (cerca
-   del principio del `<form>`):
-   ```astro
-   <input type="hidden" name="access_key" value="REEMPLAZAR_CON_ACCESS_KEY" />
-   ```
-4. Reemplazá `REEMPLAZAR_CON_ACCESS_KEY` por la key real, entre las mismas
-   comillas.
-5. Guardá, hacé `git commit` + `git push` (o el paso equivalente de deploy).
+El sitio **no tiene formulario**: los canales son WhatsApp y las casillas de
+los socios, todos definidos en `src/data/site.ts`. No hay ningún backend ni
+servicio de terceros que configurar para que funcionen — son links `wa.me` y
+`mailto:` directos.
 
-**Esa key es pública a propósito** — Web3Forms está diseñado así: no es una
-contraseña ni un secreto, y no pasa nada si queda visible en el código. La
-protección contra spam la maneja Web3Forms del lado de su servidor (dominios
-permitidos, límites de envío), más un campo "honeypot" que ya está armado en
-el formulario.
-
-Mientras `REEMPLAZAR_CON_ACCESS_KEY` siga como está, el formulario no va a
-entregar los mensajes a ningún lado — es importante hacer este paso antes de
-que el sitio quede en producción.
+Si en algún momento se quiere volver a poner un formulario, hay que elegir un
+servicio que reciba los envíos (Web3Forms, Formspree y similares), porque un
+sitio estático no puede procesarlos por su cuenta.
 
 ## Cómo hacer deploy
 
@@ -188,37 +184,15 @@ comentarios `TODO`** repartidos por el código marcando datos o contenido que
 el estudio tiene que confirmar antes de que el sitio esté listo para
 producción. Agrupados por tema:
 
-**Datos de contacto**
-
-- Email del estudio: no se publica todavía (`src/data/site.ts`, dos TODOs).
-  Una vez confirmado, se completa un solo campo y aparece automáticamente en
-  el header, footer y donde haga falta.
-
 **Dominio**
 
 - `astro.config.mjs`: reemplazar el dominio de ejemplo por el real (afecta
   sitemap, canonical, robots.txt y Open Graph — todos se generan solos a
   partir de este valor).
 
-**Formulario de contacto** (`src/components/sections/Contacto.astro`)
-
-- Cargar la access key real de Web3Forms (ver sección de arriba).
-- Sumar el email del estudio a la tarjeta de datos, cuando esté confirmado.
-- Reemplazar el `<Placeholder />` del mapa por el iframe real de Google Maps
-  (ya está escrito y comentado, listo para descomentar) cuando se confirme
-  que se quiere embeber.
-
-**Contenido de los socios** (`src/components/sections/Estudio.astro`,
-`src/components/sections/Hero.astro`)
+**Contenido de los socios** (`src/components/sections/Estudio.astro`)
 
 - Validar las bios de Esteban Asensio y Matías Martínez con el estudio.
-- Confirmar las URLs de LinkedIn y el email de cada socio.
-- Confirmar el número de matrícula del C.P.C.E. para la tarjeta del hero.
-
-**Redes sociales** (`src/components/Footer.astro`)
-
-- Confirmar las URLs reales de LinkedIn e Instagram del estudio (hoy están
-  comentadas, no se muestran).
 
 **Contenido legal** (`src/pages/politica-de-privacidad.astro`)
 

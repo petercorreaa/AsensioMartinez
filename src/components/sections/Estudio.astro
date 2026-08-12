@@ -6,6 +6,7 @@ import SectionHeading from '../ui/SectionHeading.astro';
 import Card from '../ui/Card.astro';
 import fotoEsteban from '../../assets/team/esteban.jpg';
 import fotoMatias from '../../assets/team/matias.jpg';
+import { site } from '../../data/site';
 
 // TODO: validar las bios de los socios con el cliente antes de publicar.
 const socios = [
@@ -16,8 +17,7 @@ const socios = [
     alt: 'Foto de Esteban Asensio',
     bio: 'Socio fundador. Se especializa en estructura tributaria y asesoramiento societario, acompañando a empresas en su constitución y en las decisiones que definen su crecimiento.',
     linkedin: 'https://www.linkedin.com/in/esteban-asensio-0ab8a23b/',
-    // TODO: confirmar casilla de email de Esteban Asensio.
-    email: '#',
+    email: site.emails.esteban,
   },
   {
     nombre: 'Matías Martínez',
@@ -26,8 +26,7 @@ const socios = [
     alt: 'Foto de Matías Martínez',
     bio: 'Socio. Lidera el área de gestión contable y liquidaciones, con foco en la implementación de herramientas digitales para simplificar la operación diaria de los clientes.',
     linkedin: 'https://www.linkedin.com/in/mat%C3%ADas-martinez-7982a175/',
-    // TODO: confirmar casilla de email de Matías Martínez.
-    email: '#',
+    email: site.emails.matias,
   },
 ];
 
@@ -120,8 +119,8 @@ const principios = [
                   />
                 </a>
                 <a
-                  href={socio.email}
-                  aria-label={`Email de ${socio.nombre}`}
+                  href={`mailto:${socio.email}`}
+                  aria-label={`Escribirle a ${socio.nombre} — ${socio.email}`}
                   class="border-line text-muted hover:border-brand-600 hover:text-brand-700 flex size-11 items-center justify-center border transition-colors duration-200"
                 >
                   <Icon name="lucide:mail" class="size-4" aria-hidden="true" />

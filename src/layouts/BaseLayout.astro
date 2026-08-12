@@ -41,7 +41,10 @@ const jsonLd = {
   url: Astro.site?.href,
   // Sin hardcodear: se derivan de site.ts, la misma regla que sigue el
   // resto del sitio para cualquier dato de contacto.
-  telephone: site.telefonoHref.replace('tel:', ''),
+  // El WhatsApp es el único teléfono del estudio desde que se dio de baja
+  // la línea fija, así que es el que va como `telephone`.
+  telephone: site.whatsapp,
+  email: site.emails.esteban,
   foundingDate: String(site.fundacion),
   address: {
     '@type': 'PostalAddress',
@@ -102,9 +105,51 @@ const jsonLd = {
       set:html={JSON.stringify(jsonLd)}
       is:inline
     />
+
+    {
+      /*
+      El splash se muestra UNA sola vez por sesión. Sin esto aparecería en
+      cada navegación: el sitio usa view transitions cross-document, o sea
+      que cada click es una carga de documento real, y un destello blanco por
+      click es peor que no tener splash.
+
+      is:inline y en el <head> a propósito — tiene que correr antes de que el
+      body pinte; si no, el splash igual asomaría un instante antes de que la
+      clase lo esconda.
+      */
+    }
+    <script is:inline>
+      try {
+        if (sessionStorage.getItem('am-splash')) {
+          document.documentElement.classList.add('sin-splash');
+        } else {
+          sessionStorage.setItem('am-splash', '1');
+        }
+      } catch (e) {
+        // Modo privado o storage bloqueado: no pasa nada, se muestra igual.
+      }
+    </script>
   </head>
 
   <body>
+    {
+      /*
+      aria-hidden + sin nada focuseable adentro: es decorativo y efímero, no
+      tiene que aparecer en el orden de tabulación ni anunciarse. El alt=""
+      va vacío por lo mismo. Los estilos (incluido el "no mostrarlo si no hay
+      JS") viven en global.css bajo #splash.
+      */
+    }
+    <div id="splash" aria-hidden="true">
+      <img
+        src="/favicon.png"
+        alt=""
+        width="112"
+        height="112"
+        fetchpriority="high"
+      />
+    </div>
+
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
     <Header />
@@ -118,6 +163,28 @@ const jsonLd = {
     <WhatsAppFab />
 
     <script>
+      // --- Splash: se va cuando la página terminó de cargar ---
+      const ocultarSplash = () => {
+        // Mínimo 500ms desde el arranque de la navegación. Si la página carga
+        // en 80ms, un logo que aparece y desaparece se lee como un glitch, no
+        // como un gesto de marca. performance.now() ya cuenta desde el inicio
+        // de la navegación, así que sirve tal cual.
+        const restante = Math.max(0, 500 - performance.now());
+        window.setTimeout(
+          () => document.documentElement.classList.add('cargado'),
+          restante,
+        );
+      };
+
+      // readyState por las dudas: este script es un módulo (o sea, diferido) y
+      // si la página ya terminó de cargar antes de que corra, el listener de
+      // 'load' no se dispararía nunca y el splash quedaría hasta el failsafe.
+      if (document.readyState === 'complete') {
+        ocultarSplash();
+      } else {
+        window.addEventListener('load', ocultarSplash, { once: true });
+      }
+
       // Observer único de revelado al scroll, compartido por todo el sitio
       // (ver la animación en global.css, bajo [data-reveal]). Sitio sin
       // client-side router: cada navegación es una carga de página real, así

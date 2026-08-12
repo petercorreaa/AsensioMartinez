@@ -65,16 +65,25 @@ import { site } from '../data/site';
     </nav>
 
     <div class="hidden items-center gap-6 lg:flex">
+      {
+        /*
+        Antes acá iba la línea fija con un ícono de teléfono. Se dio de baja,
+        así que el único número del estudio es el de WhatsApp: mismo lugar y
+        mismo peso visual, pero apuntando al chat.
+        */
+      }
       <a
-        href={site.telefonoHref}
+        href={site.whatsappHref}
+        target="_blank"
+        rel="noopener"
         class="text-ink hover:text-accent-700 hidden items-center gap-2 text-[15px] font-medium transition-colors duration-200 xl:inline-flex"
       >
         <Icon
-          name="lucide:phone"
-          class="text-brand-600 size-4"
+          name="simple-icons:whatsapp"
+          class="size-4 text-[#25D366]"
           aria-hidden="true"
         />
-        {site.telefono}
+        {site.whatsapp}
       </a>
       <Button href="/#contacto" variant="primary">Agendá una consulta</Button>
     </div>
