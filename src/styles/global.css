@@ -126,8 +126,18 @@
    Utilidades del proyecto
    ========================================================================== */
 
+/*
+  El ancho útil de TODO el sitio. En pantallas grandes lo que deja aire a los
+  costados no es el gutter (40px, despreciable frente a un monitor de 1920)
+  sino este max-width: es el que decide cuánto margen automático reparte el
+  `margin-inline: auto`. Subirlo es la única palanca real para que el
+  contenido no quede apretado al centro.
+
+  Va de la mano de `bleed-right`, que descuenta exactamente este número: si
+  se cambia acá, hay que cambiarlo allá.
+*/
 @utility container-xl {
-  max-width: 1200px;
+  max-width: 1440px;
   margin-inline: auto;
   padding-inline: --spacing(5);
 
@@ -142,10 +152,10 @@
 
   Descuenta las dos cosas que separan el contenido del borde:
     1. el gutter del container (--spacing(5) / --spacing(10) según el ancho), y
-    2. la mitad del sobrante cuando el viewport supera los 1200px del
+    2. la mitad del sobrante cuando el viewport supera los 1440px del
        max-width — que es lo que reparte el `margin-inline: auto`.
 
-  El max(0px, …) es para viewports más angostos que 1200px: ahí no hay margen
+  El max(0px, …) es para viewports más angostos que 1440px: ahí no hay margen
   automático que cancelar y sólo hay que descontar el gutter.
 
   Va atado a container-xl a propósito: comparte su max-width y su gutter. Si
@@ -154,10 +164,10 @@
   contra el container.
 */
 @utility bleed-right {
-  margin-right: calc(-1 * (max(0px, (100vw - 1200px) / 2) + --spacing(5)));
+  margin-right: calc(-1 * (max(0px, (100vw - 1440px) / 2) + --spacing(5)));
 
   @media (width >= 48rem) {
-    margin-right: calc(-1 * (max(0px, (100vw - 1200px) / 2) + --spacing(10)));
+    margin-right: calc(-1 * (max(0px, (100vw - 1440px) / 2) + --spacing(10)));
   }
 }
 

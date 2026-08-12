@@ -74,7 +74,7 @@ resuelto en `global.css`).
     No "corregirlo" a esquina viva.
   - Fuera de ese archivo, una clase `rounded-*` en `src/` es un bug.
 - Sombra única: `shadow-soft`
-- Contenedor: `.container-xl` (max-w 1200px, px-5 md:px-10, mx-auto)
+- Contenedor: `.container-xl` (max-w 1440px, px-5 md:px-10, mx-auto)
 - Secciones: `py-20 md:py-28` (lo aplica `Section.astro`)
 
 ## Componentes
