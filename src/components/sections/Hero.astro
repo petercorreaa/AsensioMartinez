@@ -1,8 +1,8 @@
 ---
-import { Image } from 'astro:assets';
+import { Picture } from 'astro:assets';
 import { Icon } from 'astro-icon/components';
 import Button from '../ui/Button.astro';
-import fotoEstudio from '../../assets/hero/estudio.jpg';
+import fotoHero from '../../assets/hero/hero.jpg';
 import { site } from '../../data/site';
 
 const destacados = [
@@ -127,15 +127,26 @@ const destacados = [
     <div class="bleed-right">
       {
         /*
-        Sin recorte: la foto va entera, con su relación 3:2 original, en vez
-        de recortada a 4:5 como antes. Por eso no hay contenedor con
-        aspect-ratio ni object-cover — la <Image> se dimensiona sola con el
-        width/height reales que le pone Astro.
+        Sin recorte: la foto va entera, con su relación 3:2 original. Por eso
+        no hay contenedor con aspect-ratio ni object-cover — se dimensiona
+        sola con el width/height reales que le pone Astro.
 
         bleed-right saca la columna del container-xl para que la foto llegue
         pegada al borde derecho del viewport (ver global.css). El overflow-
         hidden de la <section> se encarga del sobrante de 100vw cuando hay
         barra de scroll, así que no aparece scroll horizontal.
+
+        <Picture> en vez de <Image> para que pese lo menos posible: emite un
+        <picture> con AVIF primero y WebP después, y el navegador se queda
+        con el primero que entiende. Acá AVIF pesa la mitad que WebP (27 kB
+        contra 43 kB en el corte de 640px), y el que no lo soporta cae en
+        WebP sin ruido.
+
+        fallbackFormat="webp" para no generar además una tanda de JPG que no
+        descarga nadie: el <img> de adentro del <picture> sólo entra en juego
+        en navegadores sin <picture> (ninguno desde 2016) o sin WebP (Safari
+        anterior a 14). Con el default, esos JPG sumaban ~950 kB muertos al
+        build.
 
         widths + sizes en vez de un solo width: al sangrar, esta columna pasa
         de ~440px en un portátil a ~1200px en un monitor ancho, así que un
@@ -144,13 +155,15 @@ const destacados = [
         el ancho, así que 48vw cubre el caso máximo con un poco de aire.
 
         width={2000} además de widths: sin él, el `src` de respaldo sale con
-        la imagen original entera (3882px, 688 kB) y ese archivo termina en el
-        build al pepe. Con el tope, el respaldo es la variante de 2000px.
+        la imagen fuente entera (2560px) y ese archivo termina en el build al
+        pepe. Con el tope, el respaldo es la variante de 2000px.
       */
       }
-      <Image
-        src={fotoEstudio}
-        alt="Esteban Asensio y Matías Martínez en la entrada del estudio"
+      <Picture
+        src={fotoHero}
+        formats={['avif', 'webp']}
+        fallbackFormat="webp"
+        alt="Esteban Asensio y Matías Martínez caminando por la vereda del estudio"
         width={2000}
         widths={[640, 960, 1280, 1600, 2000]}
         sizes="(min-width: 1024px) 48vw, 100vw"
