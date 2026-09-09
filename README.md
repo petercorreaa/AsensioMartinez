@@ -114,7 +114,7 @@ Campos principales:
 ```ts
 direccion: 'Diagonal 74 nro. 752 e/ 2 y 3',              // como se muestra en pantalla
 direccionMaps: 'Diagonal 74 752, La Plata, Buenos Aires, Argentina', // sólo para las URLs del mapa
-whatsapp: '+54 221 563-7666',                            // único teléfono del estudio
+whatsapp: '+54 9 2214 20-6464',                            // único teléfono del estudio
 emails: {
   esteban: 'esteban@asensiomartinez.com.ar',
   matias: 'matias@asensiomartinez.com.ar',

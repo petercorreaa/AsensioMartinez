@@ -53,7 +53,7 @@ export interface SiteData {
  * Número de WhatsApp en formato internacional, sin signos ni espacios.
  * Vive acá para que ningún componente arme un link wa.me a mano.
  */
-const whatsappNumero = '5492215637666';
+const whatsappNumero = '5492214206464';
 
 /** Arma un link de wa.me con el mensaje ya cargado en el chat. */
 export function whatsappLink(mensaje: string): string {
@@ -68,7 +68,7 @@ export const site: SiteData = {
   ciudad: 'La Plata',
   provincia: 'Buenos Aires',
   pais: 'Argentina',
-  whatsapp: '+54 221 563-7666',
+  whatsapp: '+54 9 2214 20-6464',
   whatsappHref: whatsappLink('Hola, quisiera hacer una consulta'),
   emails: {
     esteban: 'esteban@asensiomartinez.com.ar',
