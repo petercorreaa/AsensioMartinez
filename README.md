@@ -119,7 +119,7 @@ emails: {
   esteban: 'esteban@asensiomartinez.com.ar',
   matias: 'matias@asensiomartinez.com.ar',
 },
-horario: 'Lunes a viernes, 9 a 18 h',
+horario: 'Lunes a viernes, 8:30 a 17 h',
 ```
 
 Dos cosas para tener en cuenta:

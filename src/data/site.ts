@@ -76,7 +76,7 @@ export const site: SiteData = {
   },
   instagramHref: 'https://www.instagram.com/asensiomartinezestudio/',
   linkedinHref: 'https://www.linkedin.com/company/asensio-martinez-estudio/',
-  horario: 'Lunes a viernes, 9 a 18 h',
+  horario: 'Lunes a viernes, 8:30 a 17 h',
   fundacion: 2007,
   diferenciales: [
     'Más de 15 años de trayectoria',
