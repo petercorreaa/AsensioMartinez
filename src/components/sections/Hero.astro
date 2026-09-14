@@ -41,17 +41,19 @@ const destacados = [
     <div class="hero-reveal">
       {
         /*
-        56px es el tamaño de referencia en mobile, pero "tranquilidad." mide
-        más que el ancho útil de un viewport de 390px. El clamp lo achica sólo
-        en los teléfonos más angostos y llega a 56px de 415px para arriba.
+        56px es el tamaño de referencia en mobile. El clamp lo achica sólo en
+        los teléfonos más angostos y llega a 56px recién a partir de los
+        415px de ancho — resguardo para que "negocio." (una sola unidad por
+        el inline-block de abajo, sin espacio donde cortar) no desborde en un
+        viewport angosto.
       */
       }
       <h1
         class="mt-6 text-[clamp(2.75rem,13.5vw,3.5rem)] leading-[1.05] lg:text-[72px]"
       >
-        Ordená tus números y hacé crecer tu empresa con {
+        Más que números, un socio para tu {
           /*
-          El inline-block mantiene "tranquilidad." como una sola unidad, para
+          El inline-block mantiene "negocio." como una sola unidad, para
           que el punto final nunca quede huérfano en su propio renglón. El
           punto va dentro del mismo nodo de texto a propósito: cualquier
           espacio en blanco entre etiquetas se colapsaría en un espacio visible
@@ -82,7 +84,7 @@ const destacados = [
               stroke-linecap="round"
               pathLength="1"></path>
           </svg>
-          <span class="relative">tranquilidad.</span>
+          <span class="relative">negocio.</span>
         </span>
       </h1>
 
