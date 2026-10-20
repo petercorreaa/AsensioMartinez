@@ -3,6 +3,7 @@ titulo: 'Cuánto capital necesitás para constituir una S.A.S. hoy'
 resumen: 'La Sociedad por Acciones Simplificada exige un capital social mínimo que se actualiza junto con el salario mínimo, vital y móvil. Te contamos cómo se calcula.'
 fecha: 2026-06-15
 categoria: 'Societario'
+imagen: './capital-minimo-sas.jpg'
 ---
 
 <!-- TODO: revisar vigencia y datos con el estudio antes de publicar -->

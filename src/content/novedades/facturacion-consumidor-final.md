@@ -3,6 +3,7 @@ titulo: 'Facturación electrónica a consumidor final: lo que tenés que saber'
 resumen: 'ARCA (ex AFIP) profundiza los controles sobre la facturación a consumidor final. Repasamos las obligaciones vigentes y los errores más comunes.'
 fecha: 2026-07-02
 categoria: 'Impositivo'
+imagen: './facturacion-consumidor-final.jpg'
 ---
 
 <!-- TODO: revisar vigencia y datos con el estudio antes de publicar -->

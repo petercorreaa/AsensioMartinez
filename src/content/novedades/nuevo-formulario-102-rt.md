@@ -3,6 +3,7 @@ titulo: 'ARCA presentó el nuevo Formulario 102/RT: qué cambia para tu empresa'
 resumen: 'ARCA (ex AFIP) puso en marcha el nuevo Formulario 102/RT. Repasamos quiénes están alcanzados, qué información hay que presentar y desde cuándo rige.'
 fecha: 2026-07-20
 categoria: 'Impositivo'
+imagen: './nuevo-formulario-102-rt.jpg'
 ---
 
 <!-- TODO: revisar vigencia y datos con el estudio antes de publicar -->
